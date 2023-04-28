@@ -1,5 +1,6 @@
 import { Application, Texture, Sprite } from "pixi.js";
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
+import * as React from "react";
 
 export const PixiRoot = () => {
 	const ref = useRef(null);
