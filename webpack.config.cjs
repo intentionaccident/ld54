@@ -11,7 +11,11 @@ module.exports = env => {
 		devtool: "source-map",
         mode: "development",
 		devServer: {
-			historyApiFallback: true
+			historyApiFallback: true,
+			static: {
+				directory: path.resolve(__dirname, 'assets'),
+				publicPath: '/assets'
+			}
 		},
 		resolve: {
 			extensions: [".ts", ".tsx", ".js"]
