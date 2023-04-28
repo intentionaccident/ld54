@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
+    "@types/react": "^18.2.0",
     "css-loader": "^6.7.3",
     "html-webpack-plugin": "^5.5.1",
     "pixi.js": "^7.2.4",

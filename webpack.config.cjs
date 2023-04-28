@@ -9,7 +9,7 @@ module.exports = env => {
 	return {
 		entry: ['./src/main.sass', "./src/index.tsx"],
 		devtool: "source-map",
-        mode: "development",
+		mode: "development",
 		devServer: {
 			historyApiFallback: true,
 			static: {
@@ -18,7 +18,7 @@ module.exports = env => {
 			}
 		},
 		resolve: {
-			extensions: [".ts", ".tsx", ".js"]
+			extensions: [".ts", ".tsx", ".js", ".sass"]
 		},
 		module: {
 			rules: [
