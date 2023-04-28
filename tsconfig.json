@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "allowSyntheticDefaultImports": true,
+        "sourceMap": true,
+        "module": "CommonJS",
+        "target": "ES6",
+        "jsx": "react",
+        "lib": [
+            "dom",
+            "es6",
+            "es2019.array"
+        ],
+        "rootDir": "./",
+    },
+    "include": [
+        "src/"
+    ]
+}
