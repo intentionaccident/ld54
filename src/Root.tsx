@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as PIXI from "pixi.js";
-import {GameFrame} from "./GameFrame";
-import {UIRoot} from "./UIRoot";
-import {PixiRoot} from "./PixiRoot";
-import {createBox} from "./Box";
-import {CrateType, createCrate} from "./Crate";
+import { GameFrame } from "./GameFrame";
+import { UIRoot } from "./UIRoot";
+import { PixiRoot } from "./PixiRoot";
+import { createBox } from "./Box";
+import { createBoat } from "./Boat";
 
 export function addLaneGraphics(app: PIXI.Application) {
 	const laneCount = 3;
@@ -63,17 +63,15 @@ export function Root() {
 		bunny.rotation += 0.01;
 	});
 
-	for (const type of Object.values(CrateType).filter(Number.isInteger) as CrateType[]) {
-		const item = createCrate(type)
-		item.graphics.x = app.renderer.width / app.stage.scale.x * Math.random();
-		item.graphics.y = app.renderer.height / app.stage.scale.y * Math.random();
-		app.stage.addChild(item.graphics)
-	}
+	const item = createBoat(3)
+	item.graphics.x = app.renderer.width / app.stage.scale.x * Math.random();
+	item.graphics.y = app.renderer.height / app.stage.scale.y * Math.random();
+	app.stage.addChild(item.graphics)
 
 	return <div>
 		<GameFrame>
-			<UIRoot/>
-			<PixiRoot app={app}/>
+			<UIRoot />
+			<PixiRoot app={app} />
 		</GameFrame>
 	</div>;
 }
