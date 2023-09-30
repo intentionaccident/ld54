@@ -5,8 +5,10 @@ import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
 import { createBox } from "./Box";
 import { createBoat } from "./Boat";
+import {Crate, CrateType, createCrate} from "./Crate";
 
 interface Slot {
+	crate: Crate | null
 	graphics: PIXI.Graphics
 }
 
@@ -15,20 +17,50 @@ interface Lane {
 	graphics: PIXI.Container
 }
 
+function addCrate(slot: Slot, crate: Crate | null) {
+	if (crate === null) return;
+	slot.graphics.addChild(crate.graphics);
+	crate.graphics.y = 5;
+	crate.graphics.x = 5;
+}
+
+function destroyCrate(slot: Slot) {
+	slot.crate.graphics.destroy();
+	slot.crate = null;
+}
+
+function moveCrate(from: Slot, to: Slot) {
+	if (to.crate !== null) throw Error("`to` is not empty.");
+	if(from.crate === null) return;
+	to.crate = from.crate;
+	to.graphics.addChild(from.crate.graphics);
+	from.crate = null;
+}
+
+function createRandomCrate(): Crate | null {
+	const x = Math.floor(Math.random() * 4);
+	if (x === 0) {
+		return createCrate(CrateType.Circle);
+	} else if (x === 1) {
+		return createCrate(CrateType.Square);
+	} else if (x === 2) {
+		return createCrate(CrateType.Triangle);
+	} else if (x === 3) {
+		return null;
+	} else throw new Error("Unreachable.");
+}
+
 export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const laneCount = 3;
 	const tileCount = 8;
-	const laneSpacing = 30;
+	const laneSpacing = 15;
 	const slotWidth = 50;
-	const slotHeight = 50;
-	const topMargin = (
-		app.renderer.height / app.stage.scale.y
-		- laneCount * slotHeight - (laneCount - 1) * laneSpacing
-	) / 2;
+	const slotHeight = 40;
 	const buttonSize = 25;
 	const lockButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
-	const leftMargin = lockButtonWidth;
+	const topMargin = pushButtonHeight + 10;
+	const leftMargin = 10;
 	const lanes: Lane[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		const lane: Lane = {
@@ -37,37 +69,85 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 		}
 		lane.graphics.y = topMargin + row * (slotHeight + laneSpacing);
 		for (let col = 0; col < tileCount; col++) {
-			const slot = createBox(
+			const slotGraphics = createBox(
 				slotWidth, slotHeight,
 				0x9CA28A
 			);
-			slot.x = leftMargin + col * slotWidth;
-			lane.graphics.addChild(slot);
-			lane.slots.push({
-				graphics: slot
-			})
+			slotGraphics.x = leftMargin + lockButtonWidth + col * slotWidth;
+			lane.graphics.addChild(slotGraphics);
+			let slot = {
+				crate: createRandomCrate(),
+				graphics: slotGraphics
+			};
+			addCrate(slot, slot.crate);
+			lane.slots.push(slot)
 
-			if (row == 0) {
+			if (row === 0) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
-				button.x = leftMargin + col * slotWidth;
+				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = -button.height;
-				button.on('click', () => console.log(`Top Push Button ${col}`));
+				button.on('click', () => tick(lanes, {type: "push", dir: "down", col}));
 				lane.graphics.addChild(button);
-			} else if (row == laneCount - 1) {
+			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
-				button.x = leftMargin + col * slotWidth;
+				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = slotHeight;
-				button.on('click', () => console.log(`Bottom Push Button ${col}`));
+				button.on('click', () => tick(lanes, {type: "push", dir: "up", col}));
 				lane.graphics.addChild(button);
 			}
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
-		button.on('click', () => console.log(`Lock Button ${row}`));
+		button.x = leftMargin;
+		button.on('click', () => tick(lanes, {type: "lock", row}));
 		lane.graphics.addChild(button);
 		lanes.push(lane)
 		app.stage.addChild(lane.graphics);
 	}
+
+	const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
+	button.x = leftMargin;
+	button.y = 230;
+	button.on('click', () => tick(lanes, {type: "none"}));
+	app.stage.addChild(button);
 	return lanes;
+}
+
+type Action =
+	  { type: "push", dir: "up" | "down", col: number }
+	| { type: "lock", row: number }
+	| { type: "none" };
+
+function tick(lanes: Lane[], action: Action) {
+	let lockedLane: number | null = null;
+	if (action.type === "push" && action.dir === "up") {
+		for (let row = 0; row < lanes.length - 1; row++) {
+			if (lanes[row].slots[action.col].crate === null) {
+				moveCrate(lanes[row + 1].slots[action.col], lanes[row].slots[action.col]);
+			}
+		}
+	} else if (action.type === "push" && action.dir === "down") {
+		for (let row = lanes.length - 1; row > 0; row--) {
+			if (lanes[row].slots[action.col].crate === null) {
+				moveCrate(lanes[row - 1].slots[action.col], lanes[row].slots[action.col]);
+			}
+		}
+	} else if (action.type === "lock") {
+		lockedLane = action.row;
+	}
+
+	for (let row = 0; row < lanes.length; row++) {
+		const lane = lanes[row];
+		for (let col = lane.slots.length - 1; col >= 0; col--) {
+			if (row === lockedLane) continue;
+			if (lane.slots[col].crate !== null) {
+				if (col === lane.slots.length - 1) {
+					destroyCrate(lane.slots[col]);
+				} else {
+					moveCrate(lane.slots[col], lane.slots[col + 1])
+				}
+			}
+		}
+	}
 }
 
 export function Root() {
