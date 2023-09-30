@@ -3,6 +3,7 @@ import { CRATE_WIDTH, Crate, CrateTypes, createCrate } from "./Crate";
 
 export interface Boat {
 	size: number;
+	lastFilled: number
 	crates: Crate[];
 	graphics: PIXI.Graphics;
 }
@@ -19,6 +20,7 @@ export function createBoat(size: number) {
 	const boat: Boat = {
 		size,
 		crates: [],
+		lastFilled: size,
 		graphics: new PIXI.Graphics()
 	};
 
