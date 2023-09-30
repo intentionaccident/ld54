@@ -10,7 +10,7 @@ import { CRATE_WIDTH } from "./Crate";
 import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
 
 interface ActionButton {
-	action:Action
+	action: Action
 	graphics: PIXI.Graphics
 }
 
@@ -79,7 +79,7 @@ function spawnCrateLine(slots: Slot[]) {
 	}
 }
 
-export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]  {
+export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]] {
 	const laneCount = 3;
 	const slotCount = 8;
 	const laneSpacing = 15;
@@ -121,19 +121,19 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = -button.height;
-				actionButtons.push({graphics: button, action: { type: "push", dir: "down", col }})
+				actionButtons.push({ graphics: button, action: { type: "push", dir: "down", col } })
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = slotHeight;
-				actionButtons.push({graphics: button, action: { type: "push", dir: "up", col }});
+				actionButtons.push({ graphics: button, action: { type: "push", dir: "up", col } });
 				lane.graphics.addChild(button);
 			}
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 		button.x = leftMargin;
-		actionButtons.push({graphics: button, action:  { type: "lock", row }});
+		actionButtons.push({ graphics: button, action: { type: "lock", row } });
 		lane.graphics.addChild(button);
 		lanes.push(lane)
 		app.stage.addChild(lane.graphics);
@@ -142,7 +142,7 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 	const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 	button.x = leftMargin;
 	button.y = 230;
-	actionButtons.push({graphics: button, action:  { type: "none" }});
+	actionButtons.push({ graphics: button, action: { type: "none" } });
 	app.stage.addChild(button);
 
 	for (let col = 0; col < slotCount / 2; col++) {
@@ -179,13 +179,30 @@ function tick(gameState: GameState, action: Action) {
 		const lane = lanes[row];
 		for (let col = lane.slots.length - 1; col >= 0; col--) {
 			if (row === lockedLane) continue;
-			if (lane.slots[col].crate !== null) {
-				if (col === lane.slots.length - 1) {
-					destroyCrate(lane.slots[col]);
-				} else {
-					moveCrate(lane.slots[col], lane.slots[col + 1])
+			if (lane.slots[col].crate === null) continue;
+
+			if (col !== lane.slots.length - 1) {
+				moveCrate(lane.slots[col], lane.slots[col + 1])
+				continue;
+			}
+
+			destroyCrate(lane.slots[col]);
+
+			if (!lane.boat) {
+				continue;
+			}
+
+			if (lane.boat.crates[lane.boat.lastFilled - 1].type === lane.slots[col].crate?.type) {
+				lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1
+				if (lane.boat.lastFilled > 0) {
+					continue;
 				}
 			}
+			console.log(col, lane.slots, lane.boat.crates[lane.boat.lastFilled - 1])
+
+
+			lane.boat.graphics.destroy()
+			delete lane.boat
 		}
 	}
 
@@ -260,7 +277,7 @@ export function Root() {
 		app.stage.addChild(boat.graphics)
 	}
 
-	const gameState: GameState = {actionButtons, lanes, turn: 0};
+	const gameState: GameState = { actionButtons, lanes, turn: 0 };
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
