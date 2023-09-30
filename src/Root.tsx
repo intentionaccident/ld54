@@ -26,8 +26,8 @@ function addCrate(slot: Slot, crate: Crate | null) {
 	if (crate === null) return;
 	slot.crate = crate;
 	slot.graphics.addChild(crate.graphics);
-	crate.graphics.y = 5;
-	crate.graphics.x = 5;
+	crate.graphics.y = slot.graphics.height / 2 - slot.crate.graphics.height / 2;
+	crate.graphics.x = slot.graphics.width / 2 - slot.crate.graphics.width / 2;
 }
 
 function destroyCrate(slot: Slot) {
