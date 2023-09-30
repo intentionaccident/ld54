@@ -6,7 +6,16 @@ import { PixiRoot } from "./PixiRoot";
 import { createBox } from "./Box";
 import { createBoat } from "./Boat";
 
-export function addLaneGraphics(app: PIXI.Application) {
+interface Slot {
+	graphics: PIXI.Graphics
+}
+
+interface Lane {
+	slots: Slot[]
+	graphics: PIXI.Container
+}
+
+export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const laneCount = 3;
 	const tileCount = 8;
 	const laneSpacing = 30;
@@ -20,36 +29,45 @@ export function addLaneGraphics(app: PIXI.Application) {
 	const lockButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
 	const leftMargin = lockButtonWidth;
+	const lanes: Lane[] = [];
 	for (let row = 0; row < laneCount; row++) {
-		const lane = new PIXI.Container();
-		lane.y = topMargin + row * (slotHeight + laneSpacing);
+		const lane: Lane = {
+			graphics: new PIXI.Container(),
+			slots: []
+		}
+		lane.graphics.y = topMargin + row * (slotHeight + laneSpacing);
 		for (let col = 0; col < tileCount; col++) {
 			const slot = createBox(
 				slotWidth, slotHeight,
 				0x9CA28A
 			);
 			slot.x = leftMargin + col * slotWidth;
-			lane.addChild(slot);
+			lane.graphics.addChild(slot);
+			lane.slots.push({
+				graphics: slot
+			})
 
 			if (row == 0) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + col * slotWidth;
 				button.y = -button.height;
 				button.on('click', () => console.log(`Top Push Button ${col}`));
-				lane.addChild(button);
+				lane.graphics.addChild(button);
 			} else if (row == laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + col * slotWidth;
 				button.y = slotHeight;
 				button.on('click', () => console.log(`Bottom Push Button ${col}`));
-				lane.addChild(button);
+				lane.graphics.addChild(button);
 			}
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 		button.on('click', () => console.log(`Lock Button ${row}`));
-		lane.addChild(button);
-		app.stage.addChild(lane);
+		lane.graphics.addChild(button);
+		lanes.push(lane)
+		app.stage.addChild(lane.graphics);
 	}
+	return lanes;
 }
 
 export function Root() {
