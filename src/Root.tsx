@@ -31,6 +31,7 @@ function addCrate(slot: Slot, crate: Crate | null) {
 }
 
 function destroyCrate(slot: Slot) {
+	if (slot.crate === null) throw Error("`slot` is empty.");
 	slot.crate.graphics.destroy();
 	slot.crate = null;
 }

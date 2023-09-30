@@ -4,9 +4,10 @@ import * as React from "react";
 import * as PIXI from 'pixi.js'
 
 export const PixiRoot = (props: {app: PIXI.Application}) => {
-	const ref = useRef(null);
+	const ref: React.MutableRefObject<HTMLDivElement | null> = useRef(null);
 	useEffect(() => {
-		ref.current.appendChild(props.app.view);
+		if (ref.current === null) throw new Error("Unreachable.");
+		ref.current.appendChild(props.app.view as HTMLCanvasElement);
 	}, [ref]);
 	return <div ref={ref} />;
 }
