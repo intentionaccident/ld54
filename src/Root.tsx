@@ -18,7 +18,9 @@ interface Lane {
 }
 
 function addCrate(slot: Slot, crate: Crate | null) {
+	if (slot.crate !== null) throw Error("`slot` is not empty.");
 	if (crate === null) return;
+	slot.crate = crate;
 	slot.graphics.addChild(crate.graphics);
 	crate.graphics.y = 5;
 	crate.graphics.x = 5;
@@ -76,10 +78,10 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 			slotGraphics.x = leftMargin + lockButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
 			let slot = {
-				crate: createRandomCrate(),
+				crate: null,
 				graphics: slotGraphics
 			};
-			addCrate(slot, slot.crate);
+			addCrate(slot, createRandomCrate());
 			lane.slots.push(slot)
 
 			if (row === 0) {
@@ -147,6 +149,11 @@ function tick(lanes: Lane[], action: Action) {
 				}
 			}
 		}
+	}
+
+	for (let row = 0; row < lanes.length; row++) {
+		if (row === lockedLane) continue;
+		addCrate(lanes[row].slots[0], createRandomCrate());
 	}
 }
 
