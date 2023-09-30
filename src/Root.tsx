@@ -4,8 +4,10 @@ import { GameFrame } from "./GameFrame";
 import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
 import { createBox } from "./Box";
-import { createBoat } from "./Boat";
-import {Crate, CrateType, createCrate} from "./Crate";
+import { Crate, CrateType, createCrate } from "./Crate";
+import { Boat, createBoat, getBoatLength, getBoatWidth } from "./Boat";
+import { CRATE_WIDTH } from "./Crate";
+import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
 
 interface Slot {
 	crate: Crate | null
@@ -33,7 +35,7 @@ function destroyCrate(slot: Slot) {
 
 function moveCrate(from: Slot, to: Slot) {
 	if (to.crate !== null) throw Error("`to` is not empty.");
-	if(from.crate === null) return;
+	if (from.crate === null) return;
 	to.crate = from.crate;
 	to.graphics.addChild(from.crate.graphics);
 	from.crate = null;
@@ -88,19 +90,19 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = -button.height;
-				button.on('click', () => tick(lanes, {type: "push", dir: "down", col}));
+				button.on('click', () => tick(lanes, { type: "push", dir: "down", col }));
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = slotHeight;
-				button.on('click', () => tick(lanes, {type: "push", dir: "up", col}));
+				button.on('click', () => tick(lanes, { type: "push", dir: "up", col }));
 				lane.graphics.addChild(button);
 			}
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 		button.x = leftMargin;
-		button.on('click', () => tick(lanes, {type: "lock", row}));
+		button.on('click', () => tick(lanes, { type: "lock", row }));
 		lane.graphics.addChild(button);
 		lanes.push(lane)
 		app.stage.addChild(lane.graphics);
@@ -109,13 +111,13 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 	button.x = leftMargin;
 	button.y = 230;
-	button.on('click', () => tick(lanes, {type: "none"}));
+	button.on('click', () => tick(lanes, { type: "none" }));
 	app.stage.addChild(button);
 	return lanes;
 }
 
 type Action =
-	  { type: "push", dir: "up" | "down", col: number }
+	{ type: "push", dir: "up" | "down", col: number }
 	| { type: "lock", row: number }
 	| { type: "none" };
 
@@ -157,6 +159,17 @@ function tick(lanes: Lane[], action: Action) {
 	}
 }
 
+function moorBoat(boat: Boat, moorIndex: number) {
+	boat.graphics.rotation = Math.PI / 8 * 3
+	boat.graphics.x = VIEW_WIDTH - (getBoatLength(boat) * Math.cos(boat.graphics.rotation))
+		- moorIndex * (getBoatLength(boat) * Math.cos(boat.graphics.rotation) + getBoatWidth(boat) * Math.sin(boat.graphics.rotation));
+	const deltaY = (getBoatWidth(boat) * Math.cos(boat.graphics.rotation))
+	const initialPosition = (VIEW_HEIGHT) - (getBoatLength(boat) * Math.sin(boat.graphics.rotation)) + deltaY;
+	boat.graphics.y = initialPosition
+	boat.graphics.on("mouseenter", () => boat.graphics.y -= deltaY)
+	boat.graphics.on("mouseleave", () => boat.graphics.y = initialPosition)
+}
+
 export function Root() {
 	const app = new PIXI.Application({
 		width: 1280,
@@ -178,10 +191,15 @@ export function Root() {
 		bunny.rotation += 0.01;
 	});
 
+
+
 	const item = createBoat(3)
-	item.graphics.x = app.renderer.width / app.stage.scale.x * Math.random();
-	item.graphics.y = app.renderer.height / app.stage.scale.y * Math.random();
-	app.stage.addChild(item.graphics)
+	const mooredBoats: Boat[] = []
+	for (let i = 0; i < 2; i++) {
+		const boat = createBoat(3)
+		app.stage.addChild(boat.graphics)
+		moorBoat(boat, i)
+	}
 
 	return <div>
 		<GameFrame>

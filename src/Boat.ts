@@ -1,11 +1,20 @@
 import * as PIXI from "pixi.js";
 import { CRATE_WIDTH, Crate, CrateTypes, createCrate } from "./Crate";
 
-interface Boat {
+export interface Boat {
 	size: number;
 	crates: Crate[];
 	graphics: PIXI.Graphics;
 }
+
+export function getBoatLength(boat: Boat): number {
+	return CRATE_WIDTH * boat.size
+}
+
+export function getBoatWidth(boat: Boat): number {
+	return CRATE_WIDTH
+}
+
 export function createBoat(size: number) {
 	const boat: Boat = {
 		size,
@@ -14,8 +23,18 @@ export function createBoat(size: number) {
 	};
 
 	boat.graphics.beginFill(11184810, 1);
-	boat.graphics.drawEllipse(CRATE_WIDTH * size / 2, CRATE_WIDTH / 2, CRATE_WIDTH * size / 2, CRATE_WIDTH);
+	boat.graphics.drawEllipse(getBoatLength(boat) / 2, getBoatWidth(boat) / 2, getBoatLength(boat) / 2, getBoatWidth(boat));
+	// boat.graphics.drawRect(0, 0, getBoatLength(boat), CRATE_WIDTH);
 	boat.graphics.endFill();
+
+	boat.graphics.interactive = true;
+	boat.graphics.eventMode = 'static';
+	boat.graphics.hitArea = new PIXI.Ellipse(
+		CRATE_WIDTH * size / 2,
+		CRATE_WIDTH / 2,
+		CRATE_WIDTH * size / 2,
+		CRATE_WIDTH
+	)
 
 	while (size-- > 0) {
 		const crate = createCrate(CrateTypes[CrateTypes.length * Math.random() | 0]);
@@ -26,3 +45,4 @@ export function createBoat(size: number) {
 
 	return boat;
 }
+
