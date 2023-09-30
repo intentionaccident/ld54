@@ -11,7 +11,7 @@ export function createBox(
 	graphics.drawRect(lineWidth / 2, lineWidth / 2, width - lineWidth / 2, height - lineWidth / 2);
 	if (interactive) {
 		graphics.interactive = true;
-		graphics.eventMode = 'static';
+		graphics.cursor = "pointer";
 		graphics.hitArea = new PIXI.Rectangle(0, 0, width, height)
 	}
 	return graphics;
