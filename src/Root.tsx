@@ -190,6 +190,7 @@ function tick(gameState: GameState, action: Action) {
 	}
 
 	spawnCrateLine(lanes.map(l => l.slots[0]));
+	gameState.turn++;
 }
 
 function moorBoat(boat: Boat, moorIndex: number, lanes: Lane[], mooredBoats: Boat[], app: PIXI.Container) {
