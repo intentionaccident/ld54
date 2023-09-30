@@ -17,6 +17,8 @@ interface Slot {
 interface Lane {
 	slots: Slot[]
 	graphics: PIXI.Container
+	addBoatButton: PIXI.Graphics
+	boat?: Boat
 }
 
 function addCrate(slot: Slot, crate: Crate | null) {
@@ -80,8 +82,14 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	for (let row = 0; row < laneCount; row++) {
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
-			slots: []
+			slots: [],
+			addBoatButton: createBox(slotWidth, pushButtonHeight, 0xffffff, true)
 		}
+
+		lane.addBoatButton.x = slotWidth * (tileCount + 1);
+		lane.addBoatButton.visible = false;
+		lane.graphics.addChild(lane.addBoatButton)
+
 		lane.graphics.y = topMargin + row * (slotHeight + laneSpacing);
 		for (let col = 0; col < slotCount; col++) {
 			const slotGraphics = createBox(
@@ -197,12 +205,10 @@ export function Root() {
 	bunny.anchor.x = 0.5;
 	bunny.anchor.y = 0.5;
 	app.stage.addChild(bunny);
-	addLaneGraphics(app);
+	const lanes = addLaneGraphics(app);
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
 	});
-
-
 
 	const item = createBoat(3)
 	const mooredBoats: Boat[] = []
