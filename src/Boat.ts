@@ -22,7 +22,7 @@ export function createBoat(size: number) {
 		graphics: new PIXI.Graphics()
 	};
 
-	boat.graphics.beginFill(11184810, 1);
+	boat.graphics.beginFill(0xaaaaaa, 1);
 	boat.graphics.drawEllipse(getBoatLength(boat) / 2, getBoatWidth(boat) / 2, getBoatLength(boat) / 2, getBoatWidth(boat));
 	// boat.graphics.drawRect(0, 0, getBoatLength(boat), CRATE_WIDTH);
 	boat.graphics.endFill();
@@ -39,6 +39,7 @@ export function createBoat(size: number) {
 	while (size-- > 0) {
 		const crate = createCrate(CrateTypes[CrateTypes.length * Math.random() | 0]);
 		crate.graphics.x = boat.crates.length * CRATE_WIDTH;
+		crate.graphics.alpha = 0.5;
 		boat.crates.push(crate);
 		boat.graphics.addChild(crate.graphics);
 	}

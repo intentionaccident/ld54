@@ -9,6 +9,17 @@ import { Boat, createBoat, getBoatLength, getBoatWidth } from "./Boat";
 import { CRATE_WIDTH } from "./Crate";
 import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
 
+interface ActionButton {
+	action:Action
+	graphics: PIXI.Graphics
+}
+
+interface GameState {
+	actionButtons: ActionButton[]
+	lanes: Lane[]
+	turn: number
+}
+
 interface Slot {
 	crate: Crate | null
 	graphics: PIXI.Graphics
@@ -68,7 +79,7 @@ function spawnCrateLine(slots: Slot[]) {
 	}
 }
 
-export function addLaneGraphics(app: PIXI.Application): Lane[] {
+export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]  {
 	const laneCount = 3;
 	const slotCount = 8;
 	const laneSpacing = 15;
@@ -80,6 +91,7 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const topMargin = pushButtonHeight + 10;
 	const leftMargin = 10;
 	const lanes: Lane[] = [];
+	const actionButtons: ActionButton[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
@@ -109,19 +121,19 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = -button.height;
-				button.on('click', () => tick(lanes, { type: "push", dir: "down", col }));
+				actionButtons.push({graphics: button, action: { type: "push", dir: "down", col }})
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 0xffffff, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = slotHeight;
-				button.on('click', () => tick(lanes, { type: "push", dir: "up", col }));
+				actionButtons.push({graphics: button, action: { type: "push", dir: "up", col }});
 				lane.graphics.addChild(button);
 			}
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 		button.x = leftMargin;
-		button.on('click', () => tick(lanes, { type: "lock", row }));
+		actionButtons.push({graphics: button, action:  { type: "lock", row }});
 		lane.graphics.addChild(button);
 		lanes.push(lane)
 		app.stage.addChild(lane.graphics);
@@ -130,13 +142,13 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const button = createBox(lockButtonWidth, slotHeight, 0xffffff, true);
 	button.x = leftMargin;
 	button.y = 230;
-	button.on('click', () => tick(lanes, { type: "none" }));
+	actionButtons.push({graphics: button, action:  { type: "none" }});
 	app.stage.addChild(button);
 
 	for (let col = 0; col < slotCount / 2; col++) {
 		spawnCrateLine(lanes.map(l => l.slots[col]));
 	}
-	return lanes;
+	return [lanes, actionButtons];
 }
 
 type Action =
@@ -144,7 +156,8 @@ type Action =
 	| { type: "lock", row: number }
 	| { type: "none" };
 
-function tick(lanes: Lane[], action: Action) {
+function tick(gameState: GameState, action: Action) {
+	const lanes = gameState.lanes;
 	let lockedLane: number | null = null;
 	if (action.type === "push" && action.dir === "up") {
 		for (let row = 0; row < lanes.length - 1; row++) {
@@ -234,7 +247,7 @@ export function Root() {
 	bunny.anchor.x = 0.5;
 	bunny.anchor.y = 0.5;
 	app.stage.addChild(bunny);
-	const lanes = addLaneGraphics(app);
+	const [lanes, actionButtons] = addLaneGraphics(app);
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
 	});
@@ -244,6 +257,11 @@ export function Root() {
 		const boat = createBoat(3)
 		moorBoat(boat, i, lanes, mooredBoats, app.stage)
 		app.stage.addChild(boat.graphics)
+	}
+
+	const gameState: GameState = {actionButtons, lanes, turn: 0};
+	for (const button of actionButtons) {
+		button.graphics.on('click', () => tick(gameState, button.action));
 	}
 
 	return <div>
