@@ -42,21 +42,32 @@ function moveCrate(from: Slot, to: Slot) {
 }
 
 function createRandomCrate(): Crate | null {
-	const x = Math.floor(Math.random() * 4);
+	const x = Math.floor(Math.random() * 3);
 	if (x === 0) {
 		return createCrate(CrateType.Circle);
 	} else if (x === 1) {
 		return createCrate(CrateType.Square);
 	} else if (x === 2) {
 		return createCrate(CrateType.Triangle);
-	} else if (x === 3) {
-		return null;
 	} else throw new Error("Unreachable.");
+}
+
+function spawnCrateLine(slots: Slot[]) {
+	const minCrates = 1;
+	const maxCrates = 2;
+	const crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
+	for (let i = 0; i < crateCount; i++) {
+		const slot = slots[Math.floor(Math.random() * slots.length)];
+		slots.splice(slots.indexOf(slot), 1); // del slot
+		if (slot.crate === null) {
+			addCrate(slot, createRandomCrate());
+		}
+	}
 }
 
 export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	const laneCount = 3;
-	const tileCount = 8;
+	const slotCount = 8;
 	const laneSpacing = 15;
 	const slotWidth = 50;
 	const slotHeight = 40;
@@ -72,7 +83,7 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 			slots: []
 		}
 		lane.graphics.y = topMargin + row * (slotHeight + laneSpacing);
-		for (let col = 0; col < tileCount; col++) {
+		for (let col = 0; col < slotCount; col++) {
 			const slotGraphics = createBox(
 				slotWidth, slotHeight,
 				0x9CA28A
@@ -83,7 +94,6 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 				crate: null,
 				graphics: slotGraphics
 			};
-			addCrate(slot, createRandomCrate());
 			lane.slots.push(slot)
 
 			if (row === 0) {
@@ -113,6 +123,10 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 	button.y = 230;
 	button.on('click', () => tick(lanes, { type: "none" }));
 	app.stage.addChild(button);
+
+	for (let col = 0; col < slotCount / 2; col++) {
+		spawnCrateLine(lanes.map(l => l.slots[col]));
+	}
 	return lanes;
 }
 
@@ -153,10 +167,7 @@ function tick(lanes: Lane[], action: Action) {
 		}
 	}
 
-	for (let row = 0; row < lanes.length; row++) {
-		if (row === lockedLane) continue;
-		addCrate(lanes[row].slots[0], createRandomCrate());
-	}
+	spawnCrateLine(lanes.map(l => l.slots[0]));
 }
 
 function moorBoat(boat: Boat, moorIndex: number) {
