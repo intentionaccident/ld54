@@ -86,7 +86,7 @@ export function addLaneGraphics(app: PIXI.Application): Lane[] {
 			addBoatButton: createBox(slotWidth, pushButtonHeight, 0xffffff, true)
 		}
 
-		lane.addBoatButton.x = slotWidth * (tileCount + 1);
+		lane.addBoatButton.x = slotWidth * (slotCount + 1);
 		lane.addBoatButton.visible = false;
 		lane.graphics.addChild(lane.addBoatButton)
 
