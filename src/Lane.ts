@@ -8,6 +8,7 @@ interface ActionButton {
 	graphics: PIXI.Graphics;
 }
 export interface GameState {
+	app: PIXI.Application;
 	actionButtons: ActionButton[];
 	lanes: Lane[];
 	turn: number;
