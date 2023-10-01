@@ -1,5 +1,5 @@
 import {GameState, Action, moveCrate, destroyCrate, spawnCrateLine, incrementScore, decrementLives} from "./Lane";
-
+import * as PIXI from "pixi.js";
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
@@ -58,4 +58,16 @@ export function tick(gameState: GameState, action: Action) {
 
 	spawnCrateLine(lanes.map(l => l.slots[0]));
 	gameState.turn++;
+
+	if (gameState.lives.value <= 0) {
+		const message = new PIXI.Text("You are become dead!", {
+			fill: 0xFF0000,
+			fontSize: 40
+		});
+		message.anchor.x = 0.5;
+		message.anchor.y = 0.5;
+		message.x = gameState.app.renderer.width / gameState.app.stage.scale.x / 2;
+		message.y = gameState.app.renderer.height / gameState.app.stage.scale.y / 2;
+		gameState.app.stage.addChild(message);
+	}
 }

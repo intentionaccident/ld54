@@ -85,7 +85,7 @@ export function Root() {
 	app.stage.addChild(lives)
 
 	const gameState: GameState = {
-		actionButtons, lanes, turn: 0,
+		app, actionButtons, lanes, turn: 0,
 		score: {value: 0, graphics: score},
 		lives: {value: 0, graphics: lives}
 	};
