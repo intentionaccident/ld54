@@ -10,7 +10,7 @@ export class BoatManager {
 
 	constructor(private readonly gameState: GameState) {
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
-			const boat = createBoat(3);
+			const boat = createBoat();
 			this.boats.push(boat);
 		}
 	}
@@ -39,9 +39,9 @@ export class BoatManager {
 
 		deckBoat.graphics.rotation = Math.PI / 8 * 3
 		deckBoat.graphics.x = VIEW_WIDTH - (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-			- deckBoat.moorIndex * (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation) + getBoatWidth(deckBoat) * Math.sin(deckBoat.graphics.rotation));
+			- deckBoat.moorIndex * (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation) + getBoatWidth(deckBoat) * Math.sin(deckBoat.graphics.rotation)) - 10;
 		const deltaY = (getBoatWidth(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-		const initialPosition = (VIEW_HEIGHT) - (getBoatLength(deckBoat) * Math.sin(deckBoat.graphics.rotation)) + deltaY;
+		const initialPosition = (VIEW_HEIGHT) - (getBoatLength(deckBoat) * Math.sin(deckBoat.graphics.rotation)) + deltaY - 10;
 		deckBoat.graphics.y = initialPosition
 		deckBoat.graphics.on("mouseenter", () => deckBoat.graphics.y -= deltaY)
 		deckBoat.graphics.on("mouseleave", () => deckBoat.graphics.y = initialPosition)
@@ -100,7 +100,7 @@ export class BoatManager {
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
 		lane.boat.graphics.destroy();
 		delete lane.boat;
-		this.boats.push(createBoat(3));
+		this.boats.push(createBoat());
 	}
 }
 

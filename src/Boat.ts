@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
 import { CRATE_WIDTH, Crate, CrateTypes, createCrate, CrateType } from "./Crate";
 import { Lane } from "./Lane";
-import {weightedSample} from "./random";
-import {enableJokerCrateBoats, enableJokerCrates} from "./featureToggles";
+import {randomInt, weightedSample} from "./random";
+import {enableJokerCrateBoats, enableJokerCrates, maxBoatSize, minBoatSize} from "./featureToggles";
 
 export enum BoatLocation {
 	Lane,
@@ -28,7 +28,8 @@ export function getBoatWidth(boat: Boat): number {
 	return CRATE_WIDTH
 }
 
-export function createBoat(size: number) {
+export function createBoat(size?: number) {
+	size ??= randomInt(minBoatSize, maxBoatSize);
 	const boat: Boat = {
 		size,
 		crates: [],
