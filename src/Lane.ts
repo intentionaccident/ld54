@@ -14,23 +14,29 @@ export interface ActionButton {
 }
 
 export class Slot {
-	private isClickable: boolean = false;
+	private ability: AbilityType | null = null;
 	constructor(
 		private readonly gameState: GameState,
 		public readonly graphics: PIXI.Graphics,
 		public crate: Crate | null = null
 	) {
 		this.graphics.on('click', () => {
-			if (!this.isClickable) return;
-			if (gameState.selectedSlot === null) {
-				gameState.selectedSlot = this;
-				this.showSelected();
-				for (const slot of this.gameState.lanes.flatMap(l=>l.slots)) {
-					if (slot === this) continue;
-					slot.showMoveButton();
+			if (this.ability === null) return;
+			if (this.ability === AbilityType.Swap) {
+				if (gameState.selectedSlot === null) {
+					gameState.selectedSlot = this;
+					this.showSelected();
+					for (const slot of this.gameState.lanes.flatMap(l => l.slots)) {
+						if (slot === this) continue;
+						slot.showButton(AbilityType.Swap);
+					}
+				} else {
+					tick(gameState, {type: "swap", from: gameState.selectedSlot, to: this});
 				}
+			} else if (this.ability === AbilityType.Flush) {
+				tick(gameState, {type: "flush", from: this});
 			} else {
-				tick(gameState, {type: "swap", from: gameState.selectedSlot, to: this});
+				throw new Error("Unsupported ability");
 			}
 		});
 	}
@@ -39,21 +45,21 @@ export class Slot {
 		if (this.crate === null) throw new Error('`crate` is null.');
 		this.graphics.interactive = false;
 		this.graphics.cursor = "default";
-		this.isClickable = false;
+		this.ability = null;
 		this.graphics.alpha = 1;
 	}
 
 	public showDefault() {
 		this.graphics.interactive = false;
 		this.graphics.cursor = "default";
-		this.isClickable = false;
+		this.ability = null;
 		this.graphics.alpha = 1;
 	}
 
-	public showMoveButton() {
+	public showButton(ability: AbilityType) {
 		this.graphics.interactive = true;
 		this.graphics.cursor = "pointer";
-		this.isClickable = true;
+		this.ability = ability;
 		this.graphics.alpha = 0.7;
 	}
 }
@@ -305,6 +311,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 }
 
 export type Action =
+	{ type: "flush"; from: Slot; } |
 	{ type: "swap"; from: Slot; to: Slot; } |
 	{ type: "compress"; row: number; } |
 	{ type: "fast-forward"; row: number; } |

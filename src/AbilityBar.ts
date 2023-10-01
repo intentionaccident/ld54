@@ -9,7 +9,7 @@ export enum AbilityType {
 	Lock,
 	FastForward,
 	Compress,
-	Move,
+	Swap,
 	Flush,
 	Hold
 }
@@ -37,14 +37,17 @@ export function activateAbility(state:GameState, ability: AbilityType) {
 				if (lane.lockTurnsLeft === 0) lane.button.showCompress();
 			}
 			break;
-		case AbilityType.Move:
+		case AbilityType.Swap:
 			for (const slot of state.lanes.flatMap(l => l.slots)) {
 				if (slot.crate === null) continue;
-				slot.showMoveButton();
+				slot.showButton(ability);
 			}
 			break;
 		case AbilityType.Flush:
-			// TODO:
+			for (const slot of state.lanes.flatMap(l => l.slots)) {
+				if (slot.crate === null) continue;
+				slot.showButton(ability);
+			}
 			break;
 		case AbilityType.Hold:
 			for (const lane of state.lanes) {
@@ -78,7 +81,7 @@ export class AbilityBar {
 		addText(1, "🧲");
 		buttons[1].on('click', () => activateAbility(state, AbilityType.Compress));
 		addText(2, "🏗");
-		buttons[2].on('click', () => activateAbility(state, AbilityType.Move));
+		buttons[2].on('click', () => activateAbility(state, AbilityType.Swap));
 		addText(3, "🌊");
 		buttons[3].on('click', () => activateAbility(state, AbilityType.Flush));
 		addText(4, "🕸")
