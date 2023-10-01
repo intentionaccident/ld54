@@ -4,7 +4,7 @@ import { CrateType } from "./Crate";
 import { GameState } from "./GameState";
 import {deactivateAbility} from "./AbilityBar";
 
-function moveLaneForward(gameState: GameState, lane: Lane) {
+function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 	if (lane.lockTurnsLeft > 1) {
 		lane.button.showLocked(lane.lockTurnsLeft);
 	} else {
@@ -13,7 +13,7 @@ function moveLaneForward(gameState: GameState, lane: Lane) {
 	if (lane.lockTurnsLeft > 0) {
 		return;
 	}
-	for (let col = lane.slots.length - 1; col >= 0; col--) {
+	for (let col = lane.slots.length - 1; col >= fromCol; col--) {
 		if (lane.slots[col].crate === null) continue;
 
 		if (col !== lane.slots.length - 1) {
@@ -90,6 +90,24 @@ export function tick(gameState: GameState, action: Action) {
 		lane.lockTurnsLeft = 1;
 	} else if (action.type === "swap") {
 		swapCrate(action.from, action.to);
+	} else if (action.type === "flush") {
+		let col = -1;
+		let row = -1;
+		for (let curRow = 0; curRow < gameState.lanes.length; curRow++) {
+			const lane = gameState.lanes[curRow];
+			for (let curCol = 0; curCol < lane.slots.length; curCol++) {
+				const slot = lane.slots[curCol];
+				if (slot === action.from) {
+					col = curCol;
+					row = curRow;
+					break;
+				}
+			}
+		}
+		const lane = gameState.lanes[row];
+		for (let i = 0; i < lane.slots.length - col; i++) {
+			moveLaneForward(gameState, lane, col);
+		}
 	} else if (action.type !== "none") {
 		throw new Error(`Unhandled action type ${action.type}`);
 	}

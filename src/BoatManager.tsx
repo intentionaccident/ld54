@@ -75,7 +75,7 @@ export class BoatManager {
 	}
 
 	public getUpcomingCratePool(): Record<CrateType, number> {
-		const countCrates = (type: CrateType) => this.boats.flatMap(b => b.crates).reduce((s, c) => s + c.type === type ? 1 : 0, 0);
+		const countCrates = (type: CrateType) => this.boats.flatMap(b => b.crates).reduce((s, c) => s + (c.type === type ? 1 : 0), 0);
 		const pool: Record<CrateType, number> = {
 			[CrateType.Circle]: countCrates(CrateType.Circle),
 			[CrateType.Triangle]: countCrates(CrateType.Triangle),
