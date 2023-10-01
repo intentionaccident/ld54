@@ -11,7 +11,4 @@ Ships that take nothing but just block for a few turns
 
 "tetris hold"
 
-Make crane only swap adjacent tiles
- "+" pattern or just same lane?
-
-Flush but push one forward
+"slow" ability, basically reverse of one tick flush
