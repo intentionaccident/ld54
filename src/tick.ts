@@ -2,10 +2,10 @@ import {Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCr
 import * as PIXI from "pixi.js";
 import {GameState} from "./GameState";
 import {CrateType} from "./Crate";
+import {holdForXTurns} from "./featureToggles";
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
-	let lockedLane: number | null = null;
 	if (action.type === "push" && action.dir === "up") {
 		for (let row = 0; row < lanes.length - 1; row++) {
 			if (lanes[row].slots[action.col].crate === null) {
@@ -19,13 +19,20 @@ export function tick(gameState: GameState, action: Action) {
 			}
 		}
 	} else if (action.type === "lock") {
-		lockedLane = action.row;
+		if (lanes[action.row].holdTurnsLeft <= 1) {
+			lanes[action.row].holdTurnsLeft += holdForXTurns;
+		} else {
+			return;
+		}
 	}
 
 	for (let row = 0; row < lanes.length; row++) {
 		const lane = lanes[row];
+		if (lane.holdTurnsLeft > 0) {
+			lane.holdTurnsLeft--;
+			continue;
+		}
 		for (let col = lane.slots.length - 1; col >= 0; col--) {
-			if (row === lockedLane) continue;
 			if (lane.slots[col].crate === null) continue;
 
 			if (col !== lane.slots.length - 1) {

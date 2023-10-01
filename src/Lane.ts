@@ -19,6 +19,7 @@ export interface Lane {
 	graphics: PIXI.Container;
 	addBoatButton: PIXI.Graphics;
 	boat?: Boat;
+	holdTurnsLeft: number;
 }
 
 export function incrementScore(state: GameState, value: number) {
@@ -99,7 +100,8 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
 			slots: [],
-			addBoatButton: createBox(slotWidth, pushButtonHeight, 16777215, true)
+			addBoatButton: createBox(slotWidth, pushButtonHeight, 0xffffff, true),
+			holdTurnsLeft: 0
 		};
 
 		lane.addBoatButton.x = slotWidth * (slotCount + 1);
