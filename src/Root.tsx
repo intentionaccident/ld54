@@ -40,7 +40,7 @@ export function Root() {
 	bunny.anchor.x = 0.5;
 	bunny.anchor.y = 0.5;
 	app.stage.addChild(bunny);
-	const [lanes, actionButtons] = addLaneGraphics(app);
+	const [lanes, actionButtons, lockButtonTexts] = addLaneGraphics(app);
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
 	});
@@ -55,7 +55,7 @@ export function Root() {
 	app.stage.addChild(lives)
 
 	const gameState: GameState = {
-		app, actionButtons, lanes, turn: 0,
+		app, actionButtons, lockButtonTexts, lanes, turn: 0,
 		score: { value: 0, graphics: score },
 		lives: { value: 0, graphics: lives }
 	};

@@ -28,6 +28,11 @@ export function tick(gameState: GameState, action: Action) {
 
 	for (let row = 0; row < lanes.length; row++) {
 		const lane = lanes[row];
+		if (lane.holdTurnsLeft > 1) {
+			gameState.lockButtonTexts[row].text = `L\n${lane.holdTurnsLeft-1}`;
+		} else {
+			gameState.lockButtonTexts[row].text = "";
+		}
 		if (lane.holdTurnsLeft > 0) {
 			lane.holdTurnsLeft--;
 			continue;

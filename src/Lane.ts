@@ -83,7 +83,7 @@ export function spawnCrateLine(slots: Slot[]) {
 	}
 }
 
-export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]] {
+export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[], PIXI.Text[]] {
 	const laneCount = 3;
 	const slotCount = 8;
 	const laneSpacing = 15;
@@ -96,6 +96,7 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 	const leftMargin = 10;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
+	const lockButtonTexts: PIXI.Text[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
@@ -138,6 +139,14 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
 		button.x = leftMargin;
+		const buttonText = new PIXI.Text("L\n2", {
+			fontSize: 10
+		});
+		buttonText.anchor.set(0.5, 0.5);
+		buttonText.x = button.width / 2;
+		buttonText.y = button.height / 2;
+		button.addChild(buttonText);
+		lockButtonTexts.push(buttonText);
 		actionButtons.push({ graphics: button, action: { type: "lock", row } });
 		lane.graphics.addChild(button);
 		lanes.push(lane);
@@ -153,7 +162,7 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[]]
 	for (let col = 0; col < slotCount / 2; col++) {
 		spawnCrateLine(lanes.map(l => l.slots[col]));
 	}
-	return [lanes, actionButtons];
+	return [lanes, actionButtons, lockButtonTexts];
 }
 
 export type Action =
