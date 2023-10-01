@@ -5,6 +5,7 @@ import * as PIXI from "pixi.js";
 export interface GameState {
 	app: PIXI.Application;
 	actionButtons: ActionButton[];
+	lockButtonTexts: PIXI.Text[];
 	lanes: Lane[];
 	turn: number;
 	score: { value: number, graphics: PIXI.Text };
