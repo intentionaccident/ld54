@@ -11,6 +11,8 @@ export interface GameState {
 	actionButtons: ActionButton[];
 	lanes: Lane[];
 	turn: number;
+	score: {value: number, graphics: PIXI.Text};
+	lives: {value: number, graphics: PIXI.Text};
 }
 interface Slot {
 	crate: Crate | null;
@@ -22,6 +24,25 @@ export interface Lane {
 	addBoatButton: PIXI.Graphics;
 	boat?: Boat;
 }
+
+export function incrementScore(state: GameState, value: number) {
+	setScore(state, state.score.value + value);
+}
+
+export function setScore(state: GameState, value: number) {
+	state.score.value = value;
+	state.score.graphics.text = `Score: ${value}`;
+}
+
+export function setLives(state: GameState, value: number) {
+	state.lives.value = value;
+	state.lives.graphics.text = `Lives: ${value}`;
+}
+
+export function decrementLives(state: GameState, value: number = 1) {
+	setLives(state, state.lives.value - value);
+}
+
 function addCrate(slot: Slot, crate: Crate | null) {
 	if (slot.crate !== null) throw Error("`slot` is not empty.");
 	if (crate === null) return;

@@ -5,7 +5,7 @@ import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
 import { Boat, createBoat, getBoatLength, getBoatWidth } from "./Boat";
 import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
-import { Lane, addLaneGraphics, GameState } from "./Lane";
+import {Lane, addLaneGraphics, GameState, setScore, setLives} from "./Lane";
 import { tick } from "./tick";
 
 function moorBoat(boat: Boat, moorIndex: number, lanes: Lane[], mooredBoats: Boat[], app: PIXI.Container) {
