@@ -75,11 +75,22 @@ export function Root() {
 		app.stage.addChild(boat.graphics)
 	}
 
-	const score = new PIXI.Text("0");
-	score.x = 600
+	const score = new PIXI.Text();
+	score.x = 520
 	app.stage.addChild(score);
 
-	const gameState: GameState = { actionButtons, lanes, turn: 0, score: {value: 0, graphics: score} };
+	const lives = new PIXI.Text();
+	lives.x = 520
+	lives.y = 30
+	app.stage.addChild(lives)
+
+	const gameState: GameState = {
+		actionButtons, lanes, turn: 0,
+		score: {value: 0, graphics: score},
+		lives: {value: 0, graphics: lives}
+	};
+	setScore(gameState, 0);
+	setLives(gameState, 3)
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
