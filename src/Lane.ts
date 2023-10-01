@@ -139,7 +139,7 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[],
 		}
 		const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
 		button.x = leftMargin;
-		const buttonText = new PIXI.Text("L\n2", {
+		const buttonText = new PIXI.Text("", {
 			fontSize: 10
 		});
 		buttonText.anchor.set(0.5, 0.5);

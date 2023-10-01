@@ -1,13 +1,13 @@
-import { Boat, BoatLocation, createBoat, getBoatLength, getBoatWidth } from "./Boat";
-import * as PIXI from "pixi.js";
-import { CrateType, CrateTypes } from "./Crate";
-import { VIEW_WIDTH, VIEW_HEIGHT } from "./view";
-import { GameState } from "./GameState";
-import { Lane } from "./Lane";
+import {Boat, BoatLocation, createBoat, getBoatLength, getBoatWidth} from "./Boat";
+import {CrateType, CrateTypes} from "./Crate";
+import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
+import {GameState} from "./GameState";
+import {Lane} from "./Lane";
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
 	public readonly boats: Boat[] = [];
+
 	constructor(private readonly gameState: GameState) {
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
 			const boat = createBoat(3);
@@ -15,7 +15,7 @@ export class BoatManager {
 		}
 	}
 
-	public drawBoat(): Boat | null {
+	public drawBoatFromDeck(): Boat | null {
 		const deckBoat = this.boats.find(boat => boat.location === BoatLocation.Deck)
 		if (!deckBoat) {
 			return null
@@ -62,7 +62,7 @@ export class BoatManager {
 					deckBoat.location = BoatLocation.Lane
 					unmoorBoat(deckBoat)
 
-					this.drawBoat()
+					this.drawBoatFromDeck()
 
 					for (const lane of this.gameState.lanes) {
 						lane.addBoatButton.visible = false
@@ -79,8 +79,8 @@ export class BoatManager {
 			boat => boat.crates
 				.reduce(
 					(total, next) => (total[next.type] ??= 0,
-						total[next.type]++,
-						total
+							total[next.type]++,
+							total
 					),
 					{} as Record<CrateType, number>
 				)
@@ -93,6 +93,14 @@ export class BoatManager {
 			},
 			CrateTypes.reduce((total, next) => (total[next] = 1, total), {} as Record<CrateType, number>)
 		);
+	}
+
+	public removeBoat(lane: Lane) {
+		if (lane.boat === undefined) throw new Error('`lane.boat` is null.');
+		this.boats.splice(this.boats.indexOf(lane.boat), 1);
+		lane.boat.graphics.destroy();
+		delete lane.boat;
+		this.boats.push(createBoat(3));
 	}
 }
 
@@ -108,4 +116,3 @@ function unmoorBoat(boat: Boat) {
 	boat.graphics.off("mouseenter")
 	boat.graphics.off("mouseleave")
 }
-

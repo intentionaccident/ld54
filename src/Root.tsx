@@ -62,8 +62,8 @@ export function Root() {
 
 
 	gameState.boatManager = new BoatManager(gameState)
-	gameState.boatManager.drawBoat()
-	gameState.boatManager.drawBoat()
+	gameState.boatManager.drawBoatFromDeck()
+	gameState.boatManager.drawBoatFromDeck()
 
 	setScore(gameState, 0);
 	setLives(gameState, 3)
