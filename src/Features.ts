@@ -1,4 +1,5 @@
 export interface Features {
+	enableFourthItem: boolean;
 	enableJokerCrates: boolean,
 	enableJokerCrateBoats: boolean,
 	holdForXTurns: number,
@@ -8,6 +9,7 @@ export interface Features {
 }
 
 export const createFeatures: () => Features = () => ({
+	enableFourthItem: true,
 	enableJokerCrates: true,
 	enableJokerCrateBoats: true,
 	holdForXTurns: 2,
