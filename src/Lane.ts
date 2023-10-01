@@ -1,19 +1,21 @@
 import * as PIXI from "pixi.js";
-import { createBox } from "./Box";
-import { Crate, CrateType, CrateTypes, createCrate } from "./Crate";
-import { Boat } from "./Boat";
-import { GameState } from "./GameState";
-import { enableJokerCrates, jokerCrateChance } from "./featureToggles";
-import { weightedSample } from "./random";
+import {createBox} from "./Box";
+import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
+import {Boat} from "./Boat";
+import {GameState} from "./GameState";
+import {weightedSample} from "./random";
+import {Features} from "./Features";
 
 export interface ActionButton {
 	action: Action;
 	graphics: PIXI.Graphics;
 }
+
 interface Slot {
 	crate: Crate | null;
 	graphics: PIXI.Graphics;
 }
+
 export interface Lane {
 	slots: Slot[];
 	graphics: PIXI.Container;
@@ -48,11 +50,13 @@ function addCrate(slot: Slot, crate: Crate | null) {
 	crate.graphics.y = slot.graphics.height / 2 - slot.crate.graphics.height / 2;
 	crate.graphics.x = slot.graphics.width / 2 - slot.crate.graphics.width / 2;
 }
+
 export function destroyCrate(slot: Slot) {
 	if (slot.crate === null) throw Error("`slot` is empty.");
 	slot.crate.graphics.destroy();
 	slot.crate = null;
 }
+
 export function moveCrate(from: Slot, to: Slot) {
 	if (to.crate !== null) throw Error("`to` is not empty.");
 	if (from.crate === null) return;
@@ -60,8 +64,9 @@ export function moveCrate(from: Slot, to: Slot) {
 	to.graphics.addChild(from.crate.graphics);
 	from.crate = null;
 }
-function createRandomCrate(requestPool: Record<CrateType, number>): Crate | null {
-	if (enableJokerCrates && Math.random() < jokerCrateChance) {
+
+function createRandomCrate(features: Features, requestPool: Record<CrateType, number>): Crate | null {
+	if (features.enableJokerCrates && Math.random() < features.jokerCrateChance) {
 		return createCrate(CrateType.Joker)
 	}
 
@@ -72,6 +77,7 @@ function createRandomCrate(requestPool: Record<CrateType, number>): Crate | null
 			.map(([type, weight]) => [weight, parseInt(type) as CrateType])
 	));
 }
+
 export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 	const cratePool = gameState.boatManager?.getUpcomingCratePool()
 	if (!cratePool) {
@@ -102,7 +108,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
-			addCrate(slot, createRandomCrate(cratePool));
+			addCrate(slot, createRandomCrate(gameState.features, cratePool));
 		}
 	}
 }
@@ -151,13 +157,13 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = -button.height;
-				actionButtons.push({ graphics: button, action: { type: "push", dir: "down", col } });
+				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
 				button.x = leftMargin + lockButtonWidth + col * slotWidth;
 				button.y = slotHeight;
-				actionButtons.push({ graphics: button, action: { type: "push", dir: "up", col } });
+				actionButtons.push({graphics: button, action: {type: "push", dir: "up", col}});
 				lane.graphics.addChild(button);
 			}
 		}
@@ -171,7 +177,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 		buttonText.y = button.height / 2;
 		button.addChild(buttonText);
 		lockButtonTexts.push(buttonText);
-		actionButtons.push({ graphics: button, action: { type: "lock", row } });
+		actionButtons.push({graphics: button, action: {type: "lock", row}});
 		lane.graphics.addChild(button);
 		lanes.push(lane);
 		gameState.app.stage.addChild(lane.graphics);
@@ -180,7 +186,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 	const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
 	button.x = leftMargin;
 	button.y = 230;
-	actionButtons.push({ graphics: button, action: { type: "none" } });
+	actionButtons.push({graphics: button, action: {type: "none"}});
 	gameState.app.stage.addChild(button);
 
 	for (let col = 0; col < slotCount / 2; col++) {

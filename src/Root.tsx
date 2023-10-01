@@ -7,6 +7,7 @@ import { addLaneGraphics, setScore, setLives } from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
+import {createFeatures} from "./Features";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -44,7 +45,8 @@ export function Root() {
 		lanes: [],
 		actionButtons: [],
 		score: { value: 0, graphics: score },
-		lives: { value: 0, graphics: lives }
+		lives: { value: 0, graphics: lives },
+		features: createFeatures()
 	};
 
 	gameState.boatManager = new BoatManager(gameState)
