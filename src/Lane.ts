@@ -13,9 +13,49 @@ export interface ActionButton {
 	graphics: PIXI.Graphics;
 }
 
-interface Slot {
-	crate: Crate | null;
-	graphics: PIXI.Graphics;
+export class Slot {
+	private isClickable: boolean = false;
+	constructor(
+		private readonly gameState: GameState,
+		public readonly graphics: PIXI.Graphics,
+		public crate: Crate | null = null
+	) {
+		this.graphics.on('click', () => {
+			if (!this.isClickable) return;
+			if (gameState.selectedSlot === null) {
+				gameState.selectedSlot = this;
+				this.showSelected();
+				for (const slot of this.gameState.lanes.flatMap(l=>l.slots)) {
+					if (slot === this) continue;
+					slot.showMoveButton();
+				}
+			} else {
+				tick(gameState, {type: "swap", from: gameState.selectedSlot, to: this});
+			}
+		});
+	}
+
+	public showSelected() {
+		if (this.crate === null) throw new Error('`crate` is null.');
+		this.graphics.interactive = false;
+		this.graphics.cursor = "default";
+		this.isClickable = false;
+		this.graphics.alpha = 1;
+	}
+
+	public showDefault() {
+		this.graphics.interactive = false;
+		this.graphics.cursor = "default";
+		this.isClickable = false;
+		this.graphics.alpha = 1;
+	}
+
+	public showMoveButton() {
+		this.graphics.interactive = true;
+		this.graphics.cursor = "pointer";
+		this.isClickable = true;
+		this.graphics.alpha = 0.7;
+	}
 }
 
 export interface Lane {
@@ -66,6 +106,18 @@ export function moveCrate(from: Slot, to: Slot) {
 	to.crate = from.crate;
 	to.graphics.addChild(from.crate.graphics);
 	from.crate = null;
+}
+
+export function swapCrate(from: Slot, to: Slot) {
+	if (from.crate !== null) {
+		from.crate.graphics.removeFromParent();
+		to.graphics.addChild(from.crate.graphics);
+	}
+	if (to.crate !== null) {
+		to.crate.graphics.removeFromParent();
+		from.graphics.addChild(to.crate.graphics);
+	}
+	[to.crate, from.crate] = [from.crate, to.crate];
 }
 
 function createRandomCrate(features: Features, requestPool: Record<CrateType, number>): Crate | null {
@@ -124,6 +176,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 
 export class LaneButton {
 	public ability: AbilityType = AbilityType.Lock;
+
 	constructor(
 		gameState: GameState,
 		row: number,
@@ -214,10 +267,10 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			);
 			slotGraphics.x = leftMargin + laneButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
-			let slot = {
-				crate: null,
-				graphics: slotGraphics
-			};
+			let slot = new Slot(
+				gameState,
+				slotGraphics
+			);
 			lane.slots.push(slot);
 
 			if (row === 0) {
@@ -252,6 +305,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 }
 
 export type Action =
+	{ type: "swap"; from: Slot; to: Slot; } |
 	{ type: "compress"; row: number; } |
 	{ type: "fast-forward"; row: number; } |
 	{ type: "push"; dir: "up" | "down"; col: number; } |

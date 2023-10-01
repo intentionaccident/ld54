@@ -12,7 +12,7 @@ export function createBox(
 	if (interactive) {
 		graphics.interactive = true;
 		graphics.cursor = "pointer";
-		graphics.hitArea = new PIXI.Rectangle(0, 0, width, height)
 	}
+	graphics.hitArea = new PIXI.Rectangle(0, 0, width, height);
 	return graphics;
 }
