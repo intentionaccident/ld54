@@ -75,7 +75,11 @@ export function Root() {
 		app.stage.addChild(boat.graphics)
 	}
 
-	const gameState: GameState = { actionButtons, lanes, turn: 0 };
+	const score = new PIXI.Text("0");
+	score.x = 600
+	app.stage.addChild(score);
+
+	const gameState: GameState = { actionButtons, lanes, turn: 0, score: {value: 0, graphics: score} };
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
