@@ -105,6 +105,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 	const maxCrates = 2;
 	let crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
 	for (let i = 0; i < crateCount; i++) {
+		if (slots.length === 0) break;
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
