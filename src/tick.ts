@@ -1,6 +1,7 @@
-import { Action, moveCrate, destroyCrate, spawnCrateLine, incrementScore, decrementLives } from "./Lane";
+import {Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCrateLine} from "./Lane";
 import * as PIXI from "pixi.js";
-import { GameState } from "./GameState";
+import {GameState} from "./GameState";
+import {CrateType} from "./Crate";
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
@@ -40,7 +41,11 @@ export function tick(gameState: GameState, action: Action) {
 				continue;
 			}
 
-			if (lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type) {
+			if (
+				lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type
+				|| lastCrate?.type === CrateType.Joker
+				|| lane.boat.crates[lane.boat.lastFilled - 1].type === CrateType.Joker
+			) {
 				lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1;
 				incrementScore(gameState, 1);
 				if (lane.boat.lastFilled > 0) {
