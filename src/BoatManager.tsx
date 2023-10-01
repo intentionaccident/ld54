@@ -1,8 +1,8 @@
-import { Boat, BoatLocation, createBoat, getBoatLength, getBoatWidth } from "./Boat";
-import { CrateType, CrateTypes } from "./Crate";
-import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
-import { GameState } from "./GameState";
-import { Lane } from "./Lane";
+import {Boat, BoatLocation, createBoat, getBoatLength, getBoatWidth} from "./Boat";
+import {CrateType, CrateTypes} from "./Crate";
+import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
+import {GameState} from "./GameState";
+import {Lane} from "./Lane";
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
@@ -75,14 +75,16 @@ export class BoatManager {
 	}
 
 	public getUpcomingCratePool(): Record<CrateType, number> {
-		return this.boats.map(boat => boat.crates).flat()
-			.reduce(
-				(total, next) => (total[next.type] ??= 0,
-					total[next.type]++,
-					total
-				),
-				{} as Record<CrateType, number>
-			)
+		const countCrates = (type: CrateType) => this.boats.flatMap(b => b.crates).reduce((s, c) => s + c.type === type ? 1 : 0, 0);
+		const pool: Record<CrateType, number> = {
+			[CrateType.Circle]: countCrates(CrateType.Circle),
+			[CrateType.Triangle]: countCrates(CrateType.Triangle),
+			[CrateType.Square]: countCrates(CrateType.Square),
+			[CrateType.Cross]: countCrates(CrateType.Cross),
+			[CrateType.Joker]: 0,
+		};
+		if (!this.gameState.features.enableFourthItem) pool[CrateType.Cross] = 0;
+		return pool;
 	}
 
 	public removeBoat(lane: Lane) {

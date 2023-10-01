@@ -70,8 +70,6 @@ function createRandomCrate(features: Features, requestPool: Record<CrateType, nu
 		return createCrate(CrateType.Joker)
 	}
 
-	requestPool[CrateType.Joker] = 0;
-
 	return createCrate(
 		weightedSample(
 			Object.entries(requestPool)
@@ -80,6 +78,7 @@ function createRandomCrate(features: Features, requestPool: Record<CrateType, nu
 			[1, CrateType.Circle],
 			[1, CrateType.Square],
 			[1, CrateType.Triangle],
+			[features.enableFourthItem ? 1 : 0, CrateType.Cross],
 		]) ?? CrateType.Circle
 	);
 }

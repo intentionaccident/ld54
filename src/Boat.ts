@@ -57,6 +57,7 @@ export function createBoat(features: Features, size?: number) {
 			[1, CrateType.Circle],
 			[1, CrateType.Square],
 			[1, CrateType.Triangle],
+			[features.enableFourthItem ? 1 : 0, CrateType.Cross],
 			[features.enableJokerCrateBoats ? 0.5 : 0, CrateType.Joker],
 		]) ?? CrateType.Circle);
 		crate.graphics.x = boat.crates.length * CRATE_WIDTH;

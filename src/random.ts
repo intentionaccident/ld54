@@ -1,5 +1,4 @@
 export function weightedSample<T>(options: [number, T][]): T | null {
-
 	const totalWeight = options.reduce((total, [weight, _]) => total + weight, 0);
 	if (totalWeight === 0) {
 		return null;
@@ -7,6 +6,7 @@ export function weightedSample<T>(options: [number, T][]): T | null {
 	const randomNumber = Math.random() * totalWeight;
 	let upperThreshold = 0;
 	for (const [weight, value] of options) {
+		if (isNaN(weight)) throw new Error(`'weight' of ${value} is NaN.`);
 		upperThreshold += weight;
 		if (randomNumber < upperThreshold) {
 			return value;

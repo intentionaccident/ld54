@@ -5,6 +5,7 @@ export enum CrateType {
 	Circle,
 	Triangle,
 	Square,
+	Cross,
 	Joker
 }
 
@@ -19,6 +20,7 @@ const colorMap = {
 	[CrateType.Circle]: 0xff0000,
 	[CrateType.Triangle]: 0x00ff00,
 	[CrateType.Square]: 0x0000ff,
+	[CrateType.Cross]: 0x9D009B,
 	[CrateType.Joker]: 0xFFFF00,
 };
 
@@ -40,6 +42,13 @@ export function createCrate(type: CrateType): Crate {
 			break;
 		} case CrateType.Square: {
 			graphics.drawRect(0, 0, CRATE_WIDTH, CRATE_WIDTH);
+			break;
+		} case CrateType.Cross: {
+			graphics.lineStyle(4, colorMap[type], 1)
+				.moveTo(0,0)
+				.lineTo(CRATE_WIDTH/1.5, CRATE_WIDTH/1.5)
+				.moveTo(CRATE_WIDTH/1.5, 0)
+			.lineTo(0, CRATE_WIDTH/1.5);
 			break;
 		} case CrateType.Joker: {
 			graphics.drawStar!(20/2/20 * CRATE_WIDTH, 20/2/20 * CRATE_WIDTH, 7, 12/20 * CRATE_WIDTH, 5/20 * CRATE_WIDTH);
