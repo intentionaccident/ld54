@@ -1,10 +1,10 @@
 import * as PIXI from "pixi.js";
 import { createBox } from "./Box";
-import { Crate, CrateType, createCrate } from "./Crate";
+import { Crate, CrateType, CrateTypes, createCrate } from "./Crate";
 import { Boat } from "./Boat";
 import { GameState } from "./GameState";
-import {enableJokerCrates} from "./featureToggles";
-import {weightedSample} from "./random";
+import { enableJokerCrates, jokerCrateChance } from "./featureToggles";
+import { weightedSample } from "./random";
 
 export interface ActionButton {
 	action: Action;
@@ -60,30 +60,54 @@ export function moveCrate(from: Slot, to: Slot) {
 	to.graphics.addChild(from.crate.graphics);
 	from.crate = null;
 }
-function createRandomCrate(): Crate | null {
-	return createCrate(weightedSample([
-		[1, CrateType.Circle],
-		[1, CrateType.Square],
-		[1, CrateType.Triangle],
-		[enableJokerCrates ? 0.5 : 0, CrateType.Joker],
-	]));
+function createRandomCrate(requestPool: Record<CrateType, number>): Crate | null {
+	if (enableJokerCrates && Math.random() < jokerCrateChance) {
+		return createCrate(CrateType.Joker)
+	}
+
+	requestPool[CrateType.Joker] = 0;
+
+	return createCrate(weightedSample(
+		Object.entries(requestPool)
+			.map(([type, weight]) => [weight, parseInt(type) as CrateType])
+	));
 }
-export function spawnCrateLine(slots: Slot[]) {
-	const minCrates = 1;
-	const maxCrates = 3;
+export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
+	const cratePool = gameState.boatManager?.getUpcomingCratePool()
+	if (!cratePool) {
+		return
+	}
+
+
+	const slotCrates = gameState.lanes?.map(
+		lane => lane.slots
+			.map(s => s.crate?.type)
+			.filter(t => t != null))
+		.flat()
+		.reduce((total, next) => {
+			total[next!] ??= 0
+			total[next!]++
+			return total
+		}, {} as Record<CrateType, number>) ?? []
+
+
+	for (const key of CrateTypes) {
+		cratePool[key] = Math.max(0, cratePool[key] - (slotCrates[key] ?? 0))
+	}
+
+	const minCrates = 0;
+	const maxCrates = 2;
 	let crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
-	crateCount--;
-	crateCount = Math.max(1, crateCount);
 	for (let i = 0; i < crateCount; i++) {
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
-			addCrate(slot, createRandomCrate());
+			addCrate(slot, createRandomCrate(cratePool));
 		}
 	}
 }
 
-export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[], PIXI.Text[]] {
+export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], PIXI.Text[]] {
 	const laneCount = 3;
 	const slotCount = 8;
 	const laneSpacing = 15;
@@ -150,17 +174,17 @@ export function addLaneGraphics(app: PIXI.Application): [Lane[], ActionButton[],
 		actionButtons.push({ graphics: button, action: { type: "lock", row } });
 		lane.graphics.addChild(button);
 		lanes.push(lane);
-		app.stage.addChild(lane.graphics);
+		gameState.app.stage.addChild(lane.graphics);
 	}
 
 	const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
 	button.x = leftMargin;
 	button.y = 230;
 	actionButtons.push({ graphics: button, action: { type: "none" } });
-	app.stage.addChild(button);
+	gameState.app.stage.addChild(button);
 
 	for (let col = 0; col < slotCount / 2; col++) {
-		spawnCrateLine(lanes.map(l => l.slots[col]));
+		spawnCrateLine(gameState, lanes.map(l => l.slots[col]));
 	}
 	return [lanes, actionButtons, lockButtonTexts];
 }
