@@ -7,8 +7,6 @@ pushing lane forward
 eat all ship for a few rounds
 > Fix issue where last slot is pushed down, but instead of being consumed, it moves creating wrong stuff
 
-locked lane no items plz, its weird
-
 Ships that take nothing but just block for a few turns
 
 Fast-forward
