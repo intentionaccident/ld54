@@ -1,6 +1,9 @@
-export function weightedSample<T>(options: [number, T][]): T {
+export function weightedSample<T>(options: [number, T][]): T | null {
 
 	const totalWeight = options.reduce((total, [weight, _]) => total + weight, 0);
+	if (totalWeight === 0) {
+		return null;
+	}
 	const randomNumber = Math.random() * totalWeight;
 	let upperThreshold = 0;
 	for (const [weight, value] of options) {
