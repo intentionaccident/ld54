@@ -9,10 +9,7 @@ eat all ship for a few rounds
 
 Ships that take nothing but just block for a few turns
 
-Fast-forward
 Fast-forward/flush from specific slot
-"Compress lane"
 "tetris hold"
 Swap items
 	(Only swap with gap variant?)
-Fourth item type

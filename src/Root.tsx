@@ -41,7 +41,6 @@ export function Root() {
 
 	const gameState: GameState = {
 		app,
-		lockButtonTexts: [],
 		turn: 0,
 		lanes: [],
 		actionButtons: [],
@@ -54,9 +53,8 @@ export function Root() {
 	gameState.boatManager.drawBoatFromDeck()
 	gameState.boatManager.drawBoatFromDeck()
 
-	const [lanes, actionButtons, lockButtonTexts] = addLaneGraphics(gameState);
+	const [lanes, actionButtons] = addLaneGraphics(gameState);
 	gameState.actionButtons = actionButtons
-	gameState.lockButtonTexts = lockButtonTexts
 	gameState.lanes = lanes
 	AbilityBar.create(gameState);
 

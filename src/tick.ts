@@ -1,7 +1,52 @@
-import { Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCrateLine } from "./Lane";
+import {Action, decrementLives, destroyCrate, incrementScore, Lane, moveCrate, spawnCrateLine} from "./Lane";
 import * as PIXI from "pixi.js";
 import { CrateType } from "./Crate";
 import { GameState } from "./GameState";
+
+function moveLaneForward(gameState: GameState, lane: Lane) {
+	if (lane.lockTurnsLeft > 1) {
+		lane.button.showLocked(lane.lockTurnsLeft);
+	} else {
+		lane.button.showLock();
+	}
+	if (lane.lockTurnsLeft > 0) {
+		return;
+	}
+	for (let col = lane.slots.length - 1; col >= 0; col--) {
+		if (lane.slots[col].crate === null) continue;
+
+		if (col !== lane.slots.length - 1) {
+			moveCrate(lane.slots[col], lane.slots[col + 1]);
+			continue;
+		}
+
+		const lastCrate = lane.slots[col].crate;
+		destroyCrate(lane.slots[col]);
+
+		if (!lane.boat) {
+			decrementLives(gameState);
+			continue;
+		}
+
+		if (
+			lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type
+			|| lastCrate?.type === CrateType.Joker
+			|| lane.boat.crates[lane.boat.lastFilled - 1].type === CrateType.Joker
+		) {
+			lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1;
+			incrementScore(gameState, 1);
+			if (lane.boat.lastFilled > 0) {
+				continue;
+			} else {
+				incrementScore(gameState, 1);
+			}
+		} else {
+			decrementLives(gameState);
+		}
+
+		gameState.boatManager?.removeBoat(lane);
+	}
+}
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
@@ -18,64 +63,42 @@ export function tick(gameState: GameState, action: Action) {
 			}
 		}
 	} else if (action.type === "lock") {
-		if (lanes[action.row].holdTurnsLeft <= 1) {
-			lanes[action.row].holdTurnsLeft += gameState.features.holdForXTurns;
+		if (lanes[action.row].lockTurnsLeft <= 1) {
+			lanes[action.row].lockTurnsLeft += gameState.features.holdForXTurns;
 		} else {
 			return;
 		}
+	} else if (action.type === "fast-forward") {
+		moveLaneForward(gameState, lanes[action.row]);
+		moveLaneForward(gameState, lanes[action.row]);
+		lanes[action.row].lockTurnsLeft = 1;
+	} else if (action.type === "compress") {
+		let lane = lanes[action.row];
+		for (let i = 0; i < lane.slots.length; i++) {
+			const slot = lane.slots[i];
+			if (slot.crate === null) {
+				for (let j = i + 1; j < lane.slots.length; j++) {
+					if (lane.slots[j].crate !== null) {
+						moveCrate(lane.slots[j], slot);
+						break;
+					}
+				}
+			}
+		}
+		lane.lockTurnsLeft = 1;
+	} else if (action.type !== "none") {
+		throw new Error(`Unhandled action type ${action.type}`);
 	}
 
 	for (let row = 0; row < lanes.length; row++) {
-		const lane = lanes[row];
-		if (lane.holdTurnsLeft > 1) {
-			gameState.lockButtonTexts[row].text = `L\n${lane.holdTurnsLeft - 1}`;
-		} else {
-			gameState.lockButtonTexts[row].text = "";
-		}
-		if (lane.holdTurnsLeft > 0) {
-			continue;
-		}
-		for (let col = lane.slots.length - 1; col >= 0; col--) {
-			if (lane.slots[col].crate === null) continue;
-
-			if (col !== lane.slots.length - 1) {
-				moveCrate(lane.slots[col], lane.slots[col + 1]);
-				continue;
-			}
-
-			const lastCrate = lane.slots[col].crate;
-			destroyCrate(lane.slots[col]);
-
-			if (!lane.boat) {
-				decrementLives(gameState);
-				continue;
-			}
-
-			if (
-				lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type
-				|| lastCrate?.type === CrateType.Joker
-				|| lane.boat.crates[lane.boat.lastFilled - 1].type === CrateType.Joker
-			) {
-				lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1;
-				incrementScore(gameState, 1);
-				if (lane.boat.lastFilled > 0) {
-					continue;
-				} else {
-					incrementScore(gameState, 1);
-				}
-			} else {
-				decrementLives(gameState);
-			}
-
-			gameState.boatManager?.removeBoat(lane);
-		}
+		moveLaneForward(gameState, lanes[row]);
 	}
 
-	spawnCrateLine(gameState, lanes.filter(l => l.holdTurnsLeft === 0).map(l => l.slots[0]));
+	spawnCrateLine(gameState, lanes.filter(l => l.lockTurnsLeft === 0).map(l => l.slots[0]));
 	gameState.turn++;
 
 	for (const lane of lanes) {
-		if (lane.holdTurnsLeft > 0) lane.holdTurnsLeft--;
+		if (lane.lockTurnsLeft > 0) lane.lockTurnsLeft--;
 	}
 
 	if (gameState.lives.value <= 0) {
