@@ -1,7 +1,6 @@
 import { Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCrateLine } from "./Lane";
 import * as PIXI from "pixi.js";
 import { CrateType } from "./Crate";
-import { holdForXTurns } from "./featureToggles";
 import { GameState } from "./GameState";
 
 export function tick(gameState: GameState, action: Action) {
@@ -20,7 +19,7 @@ export function tick(gameState: GameState, action: Action) {
 		}
 	} else if (action.type === "lock") {
 		if (lanes[action.row].holdTurnsLeft <= 1) {
-			lanes[action.row].holdTurnsLeft += holdForXTurns;
+			lanes[action.row].holdTurnsLeft += gameState.features.holdForXTurns;
 		} else {
 			return;
 		}

@@ -1,6 +1,7 @@
 import { BoatManager } from "./BoatManager";
 import { ActionButton, Lane } from "./Lane";
 import * as PIXI from "pixi.js";
+import {Features} from "./Features";
 
 export interface GameState {
 	app: PIXI.Application;
@@ -11,4 +12,5 @@ export interface GameState {
 	score: { value: number, graphics: PIXI.Text };
 	lives: { value: number, graphics: PIXI.Text };
 	boatManager?: BoatManager;
+	features: Features;
 }

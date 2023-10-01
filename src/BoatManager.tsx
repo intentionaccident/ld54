@@ -10,7 +10,7 @@ export class BoatManager {
 
 	constructor(private readonly gameState: GameState) {
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
-			const boat = createBoat();
+			const boat = createBoat(this.gameState.features);
 			this.boats.push(boat);
 		}
 	}
@@ -90,7 +90,7 @@ export class BoatManager {
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
 		lane.boat.graphics.destroy();
 		delete lane.boat;
-		this.boats.push(createBoat());
+		this.boats.push(createBoat(this.gameState.features));
 	}
 }
 
