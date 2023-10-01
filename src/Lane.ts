@@ -5,6 +5,8 @@ import {Boat} from "./Boat";
 import {GameState} from "./GameState";
 import {weightedSample} from "./random";
 import {Features} from "./Features";
+import {AbilityType} from "./AbilityBar";
+import {tick} from "./tick";
 
 export interface ActionButton {
 	action: Action;
@@ -21,7 +23,8 @@ export interface Lane {
 	graphics: PIXI.Container;
 	addBoatButton: PIXI.Graphics;
 	boat?: Boat;
-	holdTurnsLeft: number;
+	lockTurnsLeft: number;
+	button: LaneButton;
 }
 
 export function incrementScore(state: GameState, value: number) {
@@ -119,26 +122,84 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 	}
 }
 
-export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], PIXI.Text[]] {
+export class LaneButton {
+	public ability: AbilityType = AbilityType.Lock;
+	constructor(
+		gameState: GameState,
+		row: number,
+		private readonly graphics: PIXI.Graphics,
+		private readonly textGraphics: PIXI.Text
+	) {
+		this.showLock();
+		graphics.on('click', () => {
+			switch (this.ability) {
+				case AbilityType.FastForward:
+					tick(gameState, {type: "fast-forward", row})
+					break;
+				case AbilityType.Compress:
+					tick(gameState, {type: "compress", row})
+					break;
+				case AbilityType.Lock:
+					tick(gameState, {type: "lock", row})
+					break;
+				default:
+					throw new Error("Unreachable.");
+			}
+		});
+	}
+
+	public showFastForward() {
+		this.textGraphics.text = "⏩";
+		this.ability = AbilityType.FastForward;
+	}
+
+	public showCompress() {
+		this.textGraphics.text = "🧲";
+		this.ability = AbilityType.Compress;
+	}
+
+	public showLock() {
+		this.textGraphics.text = "🔓";
+		this.ability = AbilityType.Lock;
+	}
+
+	public showLocked(turnsLeft: number) {
+		// this.textGraphics.text = `⛓️\n${turnsLeft - 1}`;
+		this.textGraphics.text = `⛓️`;
+		this.ability = AbilityType.Lock;
+	}
+}
+
+export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] {
 	const laneCount = 3;
 	const slotCount = 8;
 	const laneSpacing = 15;
 	const slotWidth = 50;
 	const slotHeight = 40;
 	const buttonSize = 25;
-	const lockButtonWidth = buttonSize;
+	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
 	const topMargin = pushButtonHeight + 10;
 	const leftMargin = 10;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
-	const lockButtonTexts: PIXI.Text[] = [];
 	for (let row = 0; row < laneCount; row++) {
+		const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
+		laneButton.x = leftMargin;
+		const laneButtonText = new PIXI.Text("", {
+			fontSize: 10,
+			align: 'center'
+		});
+		laneButtonText.anchor.set(0.5, 0.5);
+		laneButtonText.x = laneButton.width / 2;
+		laneButtonText.y = laneButton.height / 2;
+		laneButton.addChild(laneButtonText);
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
 			slots: [],
 			addBoatButton: createBox(slotWidth, pushButtonHeight, 0xffffff, true),
-			holdTurnsLeft: 0
+			lockTurnsLeft: 0,
+			button: new LaneButton(gameState, row, laneButton, laneButtonText)
 		};
 
 		lane.addBoatButton.x = slotWidth * (slotCount + 1);
@@ -151,7 +212,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 				slotWidth, slotHeight,
 				10265226
 			);
-			slotGraphics.x = leftMargin + lockButtonWidth + col * slotWidth;
+			slotGraphics.x = leftMargin + laneButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
 			let slot = {
 				crate: null,
@@ -161,35 +222,24 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 
 			if (row === 0) {
 				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
-				button.x = leftMargin + lockButtonWidth + col * slotWidth;
+				button.x = leftMargin + laneButtonWidth + col * slotWidth;
 				button.y = -button.height;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
 				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
-				button.x = leftMargin + lockButtonWidth + col * slotWidth;
+				button.x = leftMargin + laneButtonWidth + col * slotWidth;
 				button.y = slotHeight;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "up", col}});
 				lane.graphics.addChild(button);
 			}
 		}
-		const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
-		button.x = leftMargin;
-		const buttonText = new PIXI.Text("", {
-			fontSize: 10
-		});
-		buttonText.anchor.set(0.5, 0.5);
-		buttonText.x = button.width / 2;
-		buttonText.y = button.height / 2;
-		button.addChild(buttonText);
-		lockButtonTexts.push(buttonText);
-		actionButtons.push({graphics: button, action: {type: "lock", row}});
-		lane.graphics.addChild(button);
+		lane.graphics.addChild(laneButton);
 		lanes.push(lane);
 		gameState.app.stage.addChild(lane.graphics);
 	}
 
-	const button = createBox(lockButtonWidth, slotHeight, 16777215, true);
+	const button = createBox(laneButtonWidth, slotHeight, 16777215, true);
 	button.x = leftMargin;
 	button.y = 230;
 	actionButtons.push({graphics: button, action: {type: "none"}});
@@ -198,10 +248,12 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[], 
 	for (let col = 0; col < slotCount / 2; col++) {
 		spawnCrateLine(gameState, lanes.map(l => l.slots[col]));
 	}
-	return [lanes, actionButtons, lockButtonTexts];
+	return [lanes, actionButtons];
 }
 
 export type Action =
+	{ type: "compress"; row: number; } |
+	{ type: "fast-forward"; row: number; } |
 	{ type: "push"; dir: "up" | "down"; col: number; } |
 	{ type: "lock"; row: number; } |
 	{ type: "none"; };

@@ -9,9 +9,9 @@ export interface Features {
 }
 
 export const createFeatures: () => Features = () => ({
-	enableFourthItem: true,
-	enableJokerCrates: true,
-	enableJokerCrateBoats: true,
+	enableFourthItem: false,
+	enableJokerCrates: false,
+	enableJokerCrateBoats: false,
 	holdForXTurns: 2,
 	minBoatSize: 2,
 	maxBoatSize: 3,
