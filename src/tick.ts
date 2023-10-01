@@ -69,8 +69,7 @@ export function tick(gameState: GameState, action: Action) {
 				decrementLives(gameState);
 			}
 
-			lane.boat.graphics.destroy();
-			delete lane.boat;
+			gameState.boatManager?.removeBoat(lane);
 		}
 	}
 
