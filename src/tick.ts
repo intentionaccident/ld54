@@ -33,7 +33,6 @@ export function tick(gameState: GameState, action: Action) {
 			gameState.lockButtonTexts[row].text = "";
 		}
 		if (lane.holdTurnsLeft > 0) {
-			lane.holdTurnsLeft--;
 			continue;
 		}
 		for (let col = lane.slots.length - 1; col >= 0; col--) {
@@ -72,8 +71,12 @@ export function tick(gameState: GameState, action: Action) {
 		}
 	}
 
-	spawnCrateLine(gameState, lanes.map(l => l.slots[0]));
+	spawnCrateLine(gameState, lanes.filter(l => l.holdTurnsLeft === 0).map(l => l.slots[0]));
 	gameState.turn++;
+
+	for (const lane of lanes) {
+		if (lane.holdTurnsLeft > 0) lane.holdTurnsLeft--;
+	}
 
 	if (gameState.lives.value <= 0) {
 		const message = new PIXI.Text("You are become dead!", {
