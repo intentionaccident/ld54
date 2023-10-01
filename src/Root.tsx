@@ -7,8 +7,8 @@ import { addLaneGraphics, setScore, setLives } from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
-import {createFeatures} from "./Features";
-import {AbilityBar} from "./AbilityBar";
+import { AbilityBar } from "./AbilityBar";
+import { createFeatures } from "./Features";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -18,6 +18,8 @@ export function Root() {
 		backgroundColor: 0x3AC5B9
 	});
 	app.stage.scale.set(2);
+
+
 	const texture = PIXI.Texture.from('assets/bunny.png');
 	const bunny = new PIXI.Sprite(texture);
 	bunny.x = app.renderer.width / app.stage.scale.x / 2;
@@ -29,6 +31,7 @@ export function Root() {
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
 	});
+
 
 	const score = new PIXI.Text();
 	score.x = 520
