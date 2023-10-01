@@ -1,4 +1,4 @@
-import { GameState, Action, moveCrate, destroyCrate, spawnCrateLine } from "./Lane";
+import {GameState, Action, moveCrate, destroyCrate, spawnCrateLine, incrementScore, decrementLives} from "./Lane";
 
 
 export function tick(gameState: GameState, action: Action) {
@@ -35,14 +35,20 @@ export function tick(gameState: GameState, action: Action) {
 			destroyCrate(lane.slots[col]);
 
 			if (!lane.boat) {
+				decrementLives(gameState);
 				continue;
 			}
 
 			if (lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type) {
 				lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1;
+				incrementScore(gameState, 1);
 				if (lane.boat.lastFilled > 0) {
 					continue;
+				} else {
+					incrementScore(gameState, 1);
 				}
+			} else {
+				decrementLives(gameState);
 			}
 
 			lane.boat.graphics.destroy();
