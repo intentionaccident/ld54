@@ -68,8 +68,10 @@ function createRandomCrate(): Crate | null {
 
 function spawnCrateLine(slots: Slot[]) {
 	const minCrates = 1;
-	const maxCrates = 2;
-	const crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
+	const maxCrates = 3;
+	let crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
+	crateCount--;
+	crateCount = Math.max(1, crateCount)
 	for (let i = 0; i < crateCount; i++) {
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
@@ -186,20 +188,19 @@ function tick(gameState: GameState, action: Action) {
 				continue;
 			}
 
+			const lastCrate = lane.slots[col].crate
 			destroyCrate(lane.slots[col]);
 
 			if (!lane.boat) {
 				continue;
 			}
 
-			if (lane.boat.crates[lane.boat.lastFilled - 1].type === lane.slots[col].crate?.type) {
+			if (lane.boat.crates[lane.boat.lastFilled - 1].type === lastCrate?.type) {
 				lane.boat.crates[--lane.boat.lastFilled].graphics.alpha = 1
 				if (lane.boat.lastFilled > 0) {
 					continue;
 				}
 			}
-			console.log(col, lane.slots, lane.boat.crates[lane.boat.lastFilled - 1])
-
 
 			lane.boat.graphics.destroy()
 			delete lane.boat
