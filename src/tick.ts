@@ -1,8 +1,8 @@
-import {Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCrateLine} from "./Lane";
+import { Action, decrementLives, destroyCrate, incrementScore, moveCrate, spawnCrateLine } from "./Lane";
 import * as PIXI from "pixi.js";
-import {GameState} from "./GameState";
-import {CrateType} from "./Crate";
-import {holdForXTurns} from "./featureToggles";
+import { CrateType } from "./Crate";
+import { holdForXTurns } from "./featureToggles";
+import { GameState } from "./GameState";
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
@@ -29,7 +29,7 @@ export function tick(gameState: GameState, action: Action) {
 	for (let row = 0; row < lanes.length; row++) {
 		const lane = lanes[row];
 		if (lane.holdTurnsLeft > 1) {
-			gameState.lockButtonTexts[row].text = `L\n${lane.holdTurnsLeft-1}`;
+			gameState.lockButtonTexts[row].text = `L\n${lane.holdTurnsLeft - 1}`;
 		} else {
 			gameState.lockButtonTexts[row].text = "";
 		}
@@ -73,7 +73,7 @@ export function tick(gameState: GameState, action: Action) {
 		}
 	}
 
-	spawnCrateLine(lanes.map(l => l.slots[0]));
+	spawnCrateLine(gameState, lanes.map(l => l.slots[0]));
 	gameState.turn++;
 
 	if (gameState.lives.value <= 0) {
