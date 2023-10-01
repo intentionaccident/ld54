@@ -65,7 +65,7 @@ export function tick(gameState: GameState, action: Action) {
 			}
 		}
 	} else if (action.type === "lock") {
-		if (lanes[action.row].lockTurnsLeft <= 1) {
+		if (lanes[action.row].lockTurnsLeft <= 0) {
 			lanes[action.row].lockTurnsLeft += gameState.features.holdForXTurns;
 		} else {
 			return;

@@ -9,7 +9,4 @@ eat all ship for a few rounds
 
 Ships that take nothing but just block for a few turns
 
-Fast-forward/flush from specific slot
 "tetris hold"
-Swap items
-	(Only swap with gap variant?)
