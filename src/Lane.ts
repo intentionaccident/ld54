@@ -3,6 +3,8 @@ import { createBox } from "./Box";
 import { Crate, CrateType, createCrate } from "./Crate";
 import { Boat } from "./Boat";
 import { GameState } from "./GameState";
+import {enableJokerCrates} from "./featureToggles";
+import {weightedSample} from "./random";
 
 export interface ActionButton {
 	action: Action;
@@ -58,14 +60,12 @@ export function moveCrate(from: Slot, to: Slot) {
 	from.crate = null;
 }
 function createRandomCrate(): Crate | null {
-	const x = Math.floor(Math.random() * 3);
-	if (x === 0) {
-		return createCrate(CrateType.Circle);
-	} else if (x === 1) {
-		return createCrate(CrateType.Square);
-	} else if (x === 2) {
-		return createCrate(CrateType.Triangle);
-	} else throw new Error("Unreachable.");
+	return createCrate(weightedSample([
+		[1, CrateType.Circle],
+		[1, CrateType.Square],
+		[1, CrateType.Triangle],
+		[enableJokerCrates ? 0.5 : 0, CrateType.Joker],
+	]));
 }
 export function spawnCrateLine(slots: Slot[]) {
 	const minCrates = 1;

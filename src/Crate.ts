@@ -1,9 +1,11 @@
 import * as PIXI from "pixi.js";
+import '@pixi/graphics-extras';
 
 export enum CrateType {
 	Circle,
 	Triangle,
-	Square
+	Square,
+	Joker
 }
 
 export const CrateTypes = Object.values(CrateType).filter(Number.isInteger) as CrateType[]
@@ -14,9 +16,10 @@ export interface Crate {
 }
 
 const colorMap = {
-	[CrateType.Circle]: 16711680,
-	[CrateType.Triangle]: 65280,
-	[CrateType.Square]: 255,
+	[CrateType.Circle]: 0xff0000,
+	[CrateType.Triangle]: 0x00ff00,
+	[CrateType.Square]: 0x0000ff,
+	[CrateType.Joker]: 0xFFFF00,
 };
 
 export const CRATE_WIDTH = 20;
@@ -38,6 +41,11 @@ export function createCrate(type: CrateType): Crate {
 		} case CrateType.Square: {
 			graphics.drawRect(0, 0, CRATE_WIDTH, CRATE_WIDTH);
 			break;
+		} case CrateType.Joker: {
+			graphics.drawStar!(20/2/20 * CRATE_WIDTH, 20/2/20 * CRATE_WIDTH, 7, 12/20 * CRATE_WIDTH, 5/20 * CRATE_WIDTH);
+			break;
+		} default: {
+			throw new Error("Unreachable.");
 		}
 	}
 	graphics.endFill();
