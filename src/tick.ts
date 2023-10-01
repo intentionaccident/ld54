@@ -1,8 +1,9 @@
 import {Action, decrementLives, destroyCrate, incrementScore, Lane, moveCrate, spawnCrateLine, swapCrate} from "./Lane";
 import * as PIXI from "pixi.js";
-import { CrateType } from "./Crate";
-import { GameState } from "./GameState";
+import {CrateType} from "./Crate";
+import {GameState} from "./GameState";
 import {deactivateAbility} from "./AbilityBar";
+import {CompressType, FlushType} from "./Features";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 	if (lane.lockTurnsLeft > 1) {
@@ -71,42 +72,68 @@ export function tick(gameState: GameState, action: Action) {
 			return;
 		}
 	} else if (action.type === "fast-forward") {
-		moveLaneForward(gameState, lanes[action.row]);
-		moveLaneForward(gameState, lanes[action.row]);
+		for (let i = 0; i < gameState.features.fastForwardTicks; i++) {
+			moveLaneForward(gameState, lanes[action.row]);
+		}
 		lanes[action.row].lockTurnsLeft = 1;
 	} else if (action.type === "compress") {
 		let lane = lanes[action.row];
-		for (let i = 0; i < lane.slots.length; i++) {
-			const slot = lane.slots[i];
-			if (slot.crate === null) {
-				for (let j = i + 1; j < lane.slots.length; j++) {
-					if (lane.slots[j].crate !== null) {
-						moveCrate(lane.slots[j], slot);
-						break;
+		if (gameState.features.compressType === CompressType.Full) {
+			for (let i = 0; i < lane.slots.length; i++) {
+				const slot = lane.slots[i];
+				if (slot.crate === null) {
+					for (let j = i + 1; j < lane.slots.length; j++) {
+						if (lane.slots[j].crate !== null) {
+							moveCrate(lane.slots[j], slot);
+							break;
+						}
 					}
 				}
 			}
-		}
+		} else if (gameState.features.compressType === CompressType.EatGaps) {
+			let rightSideEmpty = true;
+			let foundGap = false;
+			let gapLeftmostCol = -1;
+			for (let col = lane.slots.length - 1; col >= 0; col--) {
+				let currentEmpty = lane.slots[col].crate === null;
+				if (!foundGap) {
+					if (!rightSideEmpty && currentEmpty) {
+						foundGap = true;
+						gapLeftmostCol = col;
+					}
+				} else {
+					if (!currentEmpty) {
+						break;
+					} else {
+						gapLeftmostCol = col;
+					}
+				}
+				rightSideEmpty = currentEmpty;
+			}
+			if (!foundGap) return;
+			while (lane.slots[gapLeftmostCol].crate === null) {
+				for (let col = gapLeftmostCol + 1; col < lane.slots.length; col++) {
+					if (lane.slots[col].crate !== null) {
+						moveCrate(lane.slots[col], lane.slots[col-1]);
+					}
+				}
+			}
+		} else throw new Error("Unreachable.");
 		lane.lockTurnsLeft = 1;
 	} else if (action.type === "swap") {
 		swapCrate(action.from, action.to);
 	} else if (action.type === "flush") {
-		let col = -1;
-		let row = -1;
-		for (let curRow = 0; curRow < gameState.lanes.length; curRow++) {
-			const lane = gameState.lanes[curRow];
-			for (let curCol = 0; curCol < lane.slots.length; curCol++) {
-				const slot = lane.slots[curCol];
-				if (slot === action.from) {
-					col = curCol;
-					row = curRow;
-					break;
-				}
-			}
+		const lane = gameState.lanes[action.from.row()];
+		let flushTicks = -1;
+		if (gameState.features.flushType === FlushType.Full) {
+			flushTicks = lane.slots.length - action.from.col();
+		} else if (gameState.features.flushType === FlushType.OneTick) {
+			flushTicks = 1;
+		} else {
+			throw new Error("Unreachable.");
 		}
-		const lane = gameState.lanes[row];
-		for (let i = 0; i < lane.slots.length - col; i++) {
-			moveLaneForward(gameState, lane, col);
+		for (let i = 0; i < flushTicks; i++) {
+			moveLaneForward(gameState, lane, action.from.col());
 		}
 	} else if (action.type !== "none") {
 		throw new Error(`Unhandled action type ${action.type}`);

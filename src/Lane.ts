@@ -4,7 +4,7 @@ import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
 import {Boat} from "./Boat";
 import {GameState} from "./GameState";
 import {weightedSample} from "./random";
-import {Features} from "./Features";
+import {CranePattern, CraneType, Features} from "./Features";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
 
@@ -25,10 +25,37 @@ export class Slot {
 			if (this.ability === AbilityType.Swap) {
 				if (gameState.selectedSlot === null) {
 					gameState.selectedSlot = this;
+					gameState.activeAbility = null;
 					this.showSelected();
-					for (const slot of this.gameState.lanes.flatMap(l => l.slots)) {
-						if (slot === this) continue;
-						slot.showButton(AbilityType.Swap);
+					for (let row = 0; row < gameState.lanes.length; row++) {
+						const lane = gameState.lanes[row];
+						for (let col = 0; col < lane.slots.length; col++) {
+							const slot = lane.slots[col];
+							if (slot !== this) slot.showDefault();
+							const enableSlotIfEmpty = (slot: Slot) => {
+								if (slot === this) return;
+								if (gameState.features.craneType === CraneType.OnlyEmpty) {
+									if (slot.crate === null) slot.showButton(AbilityType.Swap);
+								} else if (gameState.features.craneType === CraneType.Swap) {
+
+								} else throw new Error("Unreachable.");
+							}
+							if (this.gameState.features.cranePattern === CranePattern.Anywhere) {
+								enableSlotIfEmpty(slot);
+							} else if (this.gameState.features.cranePattern === CranePattern.SameLane) {
+								if (
+									(row === this.row() && col === this.col() - 1)
+									|| (row === this.row() && col === this.col() + 1)
+								) enableSlotIfEmpty(slot);
+							} else if (this.gameState.features.cranePattern === CranePattern.Cross) {
+								if (
+									(row === this.row() && col === this.col() - 1)
+									|| (row === this.row() && col === this.col() + 1)
+									|| (row === this.row() - 1 && col === this.col())
+									|| (row === this.row() + 1 && col === this.col())
+								) enableSlotIfEmpty(slot);
+							} else throw new Error("Unreachable.");
+						}
 					}
 				} else {
 					tick(gameState, {type: "swap", from: gameState.selectedSlot, to: this});
@@ -39,6 +66,24 @@ export class Slot {
 				throw new Error("Unsupported ability");
 			}
 		});
+	}
+
+	public col(): number {
+		for (let row = 0; row < this.gameState.lanes.length; row++) {
+			for (let col = 0; col < this.gameState.lanes[row].slots.length; col++) {
+				if (this.gameState.lanes[row].slots[col] === this) return col;
+			}
+		}
+		throw new Error('Unreachable.');
+	}
+
+	public row(): number {
+		for (let row = 0; row < this.gameState.lanes.length; row++) {
+			for (let col = 0; col < this.gameState.lanes[row].slots.length; col++) {
+				if (this.gameState.lanes[row].slots[col] === this) return row;
+			}
+		}
+		throw new Error('Unreachable.');
 	}
 
 	public showSelected() {
