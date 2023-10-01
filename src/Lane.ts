@@ -72,10 +72,16 @@ function createRandomCrate(features: Features, requestPool: Record<CrateType, nu
 
 	requestPool[CrateType.Joker] = 0;
 
-	return createCrate(weightedSample(
-		Object.entries(requestPool)
-			.map(([type, weight]) => [weight, parseInt(type) as CrateType])
-	));
+	return createCrate(
+		weightedSample(
+			Object.entries(requestPool)
+				.map(([type, weight]) => [weight, parseInt(type) as CrateType])
+		) ?? weightedSample([
+			[1, CrateType.Circle],
+			[1, CrateType.Square],
+			[1, CrateType.Triangle],
+		]) ?? CrateType.Circle
+	);
 }
 
 export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
