@@ -8,6 +8,7 @@ import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
 import {createFeatures} from "./Features";
+import {AbilityBar} from "./AbilityBar";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -57,6 +58,7 @@ export function Root() {
 	gameState.actionButtons = actionButtons
 	gameState.lockButtonTexts = lockButtonTexts
 	gameState.lanes = lanes
+	AbilityBar.create(gameState);
 
 	setScore(gameState, 0);
 	setLives(gameState, 3)
