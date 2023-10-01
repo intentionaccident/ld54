@@ -50,7 +50,8 @@ export function Root() {
 		score: { value: 0, graphics: score },
 		lives: { value: 0, graphics: lives },
 		features: createFeatures(),
-		selectedSlot: null
+		selectedSlot: null,
+		activeAbility: null
 	};
 
 	gameState.boatManager = new BoatManager(gameState)
