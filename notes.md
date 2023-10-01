@@ -10,3 +10,8 @@ eat all ship for a few rounds
 Ships that take nothing but just block for a few turns
 
 "tetris hold"
+
+Make crane only swap adjacent tiles
+ "+" pattern or just same lane?
+
+Flush but push one forward

@@ -22,9 +22,14 @@ export function deactivateAbility(state:GameState) {
 		slot.showDefault();
 	}
 	state.selectedSlot = null;
+	state.activeAbility = null;
 }
 
 export function activateAbility(state:GameState, ability: AbilityType) {
+	if (state.activeAbility === ability) {
+		deactivateAbility(state);
+		return;
+	}
 	deactivateAbility(state);
 	switch (ability) {
 		case AbilityType.FastForward:
@@ -57,6 +62,7 @@ export function activateAbility(state:GameState, ability: AbilityType) {
 		default:
 			throw new Error('Unreachable.');
 	}
+	state.activeAbility = ability;
 }
 
 export class AbilityBar {
