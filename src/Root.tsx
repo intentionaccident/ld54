@@ -3,10 +3,12 @@ import * as PIXI from "pixi.js";
 import { GameFrame } from "./GameFrame";
 import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
-import { Boat, createBoat, getBoatLength, getBoatWidth } from "./Boat";
+import { Boat, getBoatLength, getBoatWidth } from "./Boat";
 import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
-import {Lane, addLaneGraphics, GameState, setScore, setLives} from "./Lane";
+import { Lane, addLaneGraphics, setScore, setLives } from "./Lane";
+import { GameState } from "./GameState";
 import { tick } from "./tick";
+import { BoatManager } from "./BoatManager";
 
 function moorBoat(boat: Boat, moorIndex: number, lanes: Lane[], mooredBoats: Boat[], app: PIXI.Container) {
 	boat.graphics.rotation = Math.PI / 8 * 3
@@ -20,31 +22,6 @@ function moorBoat(boat: Boat, moorIndex: number, lanes: Lane[], mooredBoats: Boa
 
 	mooredBoats[moorIndex] = boat
 
-	boat.graphics.on("click", () => {
-		for (const lane of lanes) {
-			lane.addBoatButton.visible = !lane.boat
-			lane.addBoatButton.off("click")
-			if (!lane.addBoatButton.visible) {
-				continue
-			}
-
-			lane.addBoatButton.on("click", () => {
-				moveBoatToLane(boat, lane)
-				lane.boat = boat
-				const removedBoat = mooredBoats.findIndex(m => m === boat)
-				unmoorBoat(boat)
-
-				mooredBoats[removedBoat] = createBoat(3)
-				app.addChild(mooredBoats[removedBoat].graphics)
-
-				moorBoat(mooredBoats[removedBoat], removedBoat, lanes, mooredBoats, app)
-				for (const lane of lanes) {
-					lane.addBoatButton.visible = false
-					lane.addBoatButton.off("click")
-				}
-			})
-		}
-	})
 }
 
 export function Root() {
@@ -68,13 +45,6 @@ export function Root() {
 		bunny.rotation += 0.01;
 	});
 
-	const mooredBoats: Boat[] = []
-	for (let i = 0; i < 2; i++) {
-		const boat = createBoat(3)
-		moorBoat(boat, i, lanes, mooredBoats, app.stage)
-		app.stage.addChild(boat.graphics)
-	}
-
 	const score = new PIXI.Text();
 	score.x = 520
 	app.stage.addChild(score);
@@ -86,9 +56,15 @@ export function Root() {
 
 	const gameState: GameState = {
 		app, actionButtons, lanes, turn: 0,
-		score: {value: 0, graphics: score},
-		lives: {value: 0, graphics: lives}
+		score: { value: 0, graphics: score },
+		lives: { value: 0, graphics: lives }
 	};
+
+
+	gameState.boatManager = new BoatManager(gameState)
+	gameState.boatManager.drawBoat()
+	gameState.boatManager.drawBoat()
+
 	setScore(gameState, 0);
 	setLives(gameState, 3)
 	for (const button of actionButtons) {
@@ -101,17 +77,4 @@ export function Root() {
 			<PixiRoot app={app} />
 		</GameFrame>
 	</div>;
-}
-
-function moveBoatToLane(boat: Boat, lane: Lane) {
-	boat.graphics.rotation = 0
-	boat.graphics.y = 0
-	boat.graphics.x = 500
-	lane.graphics.addChild(boat.graphics)
-}
-
-function unmoorBoat(boat: Boat) {
-	boat.graphics.interactive = false
-	boat.graphics.off("mouseenter")
-	boat.graphics.off("mouseleave")
 }

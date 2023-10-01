@@ -1,5 +1,6 @@
-import {GameState, Action, moveCrate, destroyCrate, spawnCrateLine, incrementScore, decrementLives} from "./Lane";
+import { Action, moveCrate, destroyCrate, spawnCrateLine, incrementScore, decrementLives } from "./Lane";
 import * as PIXI from "pixi.js";
+import { GameState } from "./GameState";
 
 export function tick(gameState: GameState, action: Action) {
 	const lanes = gameState.lanes;
