@@ -18,28 +18,36 @@ export function deactivateAbility(state:GameState) {
 	for (let lane of state.lanes) {
 		if (lane.lockTurnsLeft === 0) lane.button.showLock();
 	}
+	for (const slot of state.lanes.flatMap(l => l.slots)) {
+		slot.showDefault();
+	}
+	state.selectedSlot = null;
 }
 
 export function activateAbility(state:GameState, ability: AbilityType) {
+	deactivateAbility(state);
 	switch (ability) {
 		case AbilityType.FastForward:
-			for (let lane of state.lanes) {
+			for (const lane of state.lanes) {
 				if (lane.lockTurnsLeft === 0) lane.button.showFastForward();
 			}
 			break;
 		case AbilityType.Compress:
-			for (let lane of state.lanes) {
+			for (const lane of state.lanes) {
 				if (lane.lockTurnsLeft === 0) lane.button.showCompress();
 			}
 			break;
 		case AbilityType.Move:
-			// TODO:
+			for (const slot of state.lanes.flatMap(l => l.slots)) {
+				if (slot.crate === null) continue;
+				slot.showMoveButton();
+			}
 			break;
 		case AbilityType.Flush:
 			// TODO:
 			break;
 		case AbilityType.Hold:
-			for (let lane of state.lanes) {
+			for (const lane of state.lanes) {
 				if (lane.lockTurnsLeft === 0) lane.button.showLock();
 			}
 			break;

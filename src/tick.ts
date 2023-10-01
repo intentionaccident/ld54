@@ -1,7 +1,8 @@
-import {Action, decrementLives, destroyCrate, incrementScore, Lane, moveCrate, spawnCrateLine} from "./Lane";
+import {Action, decrementLives, destroyCrate, incrementScore, Lane, moveCrate, spawnCrateLine, swapCrate} from "./Lane";
 import * as PIXI from "pixi.js";
 import { CrateType } from "./Crate";
 import { GameState } from "./GameState";
+import {deactivateAbility} from "./AbilityBar";
 
 function moveLaneForward(gameState: GameState, lane: Lane) {
 	if (lane.lockTurnsLeft > 1) {
@@ -49,6 +50,7 @@ function moveLaneForward(gameState: GameState, lane: Lane) {
 }
 
 export function tick(gameState: GameState, action: Action) {
+	deactivateAbility(gameState);
 	const lanes = gameState.lanes;
 	if (action.type === "push" && action.dir === "up") {
 		for (let row = 0; row < lanes.length - 1; row++) {
@@ -86,6 +88,8 @@ export function tick(gameState: GameState, action: Action) {
 			}
 		}
 		lane.lockTurnsLeft = 1;
+	} else if (action.type === "swap") {
+		swapCrate(action.from, action.to);
 	} else if (action.type !== "none") {
 		throw new Error(`Unhandled action type ${action.type}`);
 	}
