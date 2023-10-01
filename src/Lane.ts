@@ -2,18 +2,11 @@ import * as PIXI from "pixi.js";
 import { createBox } from "./Box";
 import { Crate, CrateType, createCrate } from "./Crate";
 import { Boat } from "./Boat";
+import { GameState } from "./GameState";
 
-interface ActionButton {
+export interface ActionButton {
 	action: Action;
 	graphics: PIXI.Graphics;
-}
-export interface GameState {
-	app: PIXI.Application;
-	actionButtons: ActionButton[];
-	lanes: Lane[];
-	turn: number;
-	score: {value: number, graphics: PIXI.Text};
-	lives: {value: number, graphics: PIXI.Text};
 }
 interface Slot {
 	crate: Crate | null;

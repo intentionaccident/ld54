@@ -1,11 +1,21 @@
 import * as PIXI from "pixi.js";
 import { CRATE_WIDTH, Crate, CrateTypes, createCrate } from "./Crate";
+import { Lane } from "./Lane";
+
+export enum BoatLocation {
+	Lane,
+	Hand,
+	Deck
+}
 
 export interface Boat {
 	size: number;
+	location: BoatLocation;
+	lane?: Lane;
 	lastFilled: number
 	crates: Crate[];
 	graphics: PIXI.Graphics;
+	moorIndex?: number;
 }
 
 export function getBoatLength(boat: Boat): number {
@@ -21,7 +31,8 @@ export function createBoat(size: number) {
 		size,
 		crates: [],
 		lastFilled: size,
-		graphics: new PIXI.Graphics()
+		graphics: new PIXI.Graphics(),
+		location: BoatLocation.Deck
 	};
 
 	boat.graphics.beginFill(0xaaaaaa, 1);
@@ -48,4 +59,3 @@ export function createBoat(size: number) {
 
 	return boat;
 }
-
