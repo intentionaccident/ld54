@@ -30,6 +30,7 @@ export interface Features {
 	jokerCrateChance: number,
 	cranePattern: CranePattern,
 	craneType: CraneType,
+	craneRange: number,
 	compressType: CompressType,
 	flushType: FlushType
 }
@@ -45,6 +46,7 @@ export const createFeatures: () => Features = () => ({
 	jokerCrateChance: 1 / 20,
 	craneType: CraneType.OnlyEmpty,
 	cranePattern: CranePattern.Cross,
+	craneRange: 1, // Only applies to CranePattern.Cross and CranePattern.SameLane
 	compressType: CompressType.EatGaps,
 	flushType: FlushType.OneTick
 });

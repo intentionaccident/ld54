@@ -1,8 +1,9 @@
 import { BoatManager } from "./BoatManager";
-import {ActionButton, Lane, LaneButton, Slot} from "./Lane";
+import {ActionButton, Lane, LaneButton} from "./Lane";
 import * as PIXI from "pixi.js";
 import {Features} from "./Features";
 import {AbilityType} from "./AbilityBar";
+import {Slot} from "./Slot";
 
 export interface GameState {
 	app: PIXI.Application;
