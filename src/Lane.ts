@@ -240,7 +240,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const buttonSize = 50;
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
-	const topMargin = pushButtonHeight + 10;
+	const topMargin = pushButtonHeight + 10 + 20;
 	let leftMargin = 40 + laneCount * 16;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];

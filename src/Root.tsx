@@ -6,7 +6,7 @@ import { PixiRoot } from "./PixiRoot";
 import { addLaneGraphics, setScore, setLives, setLevel, incrementLevel, setProgress } from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
-import { BoatManager } from "./BoatManager";
+import {BoatManager, moveBoatToLane} from "./BoatManager";
 import { AbilityBar } from "./AbilityBar";
 import { animate } from "./animate";
 import { advanceLevel, createConfiguration } from "./Configuration";

@@ -3,6 +3,7 @@ import {CrateType} from "./Crate";
 import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
 import {GameState} from "./GameState";
 import {Lane} from "./Lane";
+import {slotTexture} from "./Slot";
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
@@ -34,20 +35,18 @@ export class BoatManager {
 
 		deckBoat.location = BoatLocation.Hand;
 		deckBoat.moorIndex = index;
-		this.gameState.app.stage.addChild(deckBoat.graphics);
+		this.gameState.app.stage.addChild(deckBoat.manifestGraphics);
 
 
-		deckBoat.graphics.rotation = Math.PI / 8 * 3
-		deckBoat.graphics.x = VIEW_WIDTH - (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-			- deckBoat.moorIndex * (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation) + getBoatWidth(deckBoat) * Math.sin(deckBoat.graphics.rotation)) - 20;
-		const deltaY = (getBoatWidth(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-		const initialPosition = (VIEW_HEIGHT) - (getBoatLength(deckBoat) * Math.sin(deckBoat.graphics.rotation)) + deltaY - 20;
-		deckBoat.graphics.y = initialPosition
-		deckBoat.graphics.on("mouseenter", () => deckBoat.graphics.y -= deltaY)
-		deckBoat.graphics.on("mouseleave", () => deckBoat.graphics.y = initialPosition)
+		deckBoat.manifestGraphics.x = 900 + index * 120;
+		const deltaY = 50;
+		const initialPosition = VIEW_HEIGHT - deckBoat.manifestGraphics.height + deltaY;
+		deckBoat.manifestGraphics.y = initialPosition;
+		deckBoat.manifestGraphics.on("mouseenter", () => deckBoat.manifestGraphics.y = initialPosition - deltaY)
+		deckBoat.manifestGraphics.on("mouseleave", () => deckBoat.manifestGraphics.y = initialPosition)
 
 
-		deckBoat.graphics.on("click", () => {
+		deckBoat.manifestGraphics.on("click", () => {
 			for (const lane of this.gameState.lanes) {
 				lane.addBoatButton.visible = !lane.boat
 				lane.addBoatButton.off("click")
@@ -90,7 +89,8 @@ export class BoatManager {
 	public removeBoat(lane: Lane) {
 		if (lane.boat === undefined) throw new Error('`lane.boat` is null.');
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
-		lane.boat.graphics.destroy();
+		lane.boat.manifestGraphics.destroy();
+		lane.boat.boatGraphics.destroy();
 		delete lane.boat;
 		this.boats.push(createBoat(this.gameState.configuration));
 	}
@@ -114,7 +114,9 @@ export class BoatManager {
 		}
 		const count = this.boats.length;
 		while (this.boats.length > 0) {
-			this.boats.pop()!.graphics.destroy();
+			let boat = this.boats.pop()!;
+			boat.boatGraphics.destroy();
+			boat.manifestGraphics.destroy();
 		}
 		for (let i = 0; i < count; i++) {
 			this.boats.push(createBoat(this.gameState.configuration))
@@ -128,16 +130,15 @@ export class BoatManager {
 	}
 }
 
-function moveBoatToLane(boat: Boat, lane: Lane) {
-	boat.graphics.rotation = 0;
-	boat.graphics.pivot.set(-boat.graphics.width/2, -boat.graphics.height/2);
-	boat.graphics.y = 0;
-	boat.graphics.x = 800;
-	lane.graphics.addChild(boat.graphics);
+export function moveBoatToLane(boat: Boat, lane: Lane) {
+	boat.boatGraphics.pivot.set(0, -boat.boatGraphics.height/2);
+	boat.boatGraphics.y = -120;
+	boat.boatGraphics.x = lane.addBoatButton.x;
+	lane.graphics.addChild(boat.boatGraphics);
 }
 
 function unmoorBoat(boat: Boat) {
-	boat.graphics.interactive = false
-	boat.graphics.off("mouseenter")
-	boat.graphics.off("mouseleave")
+	boat.manifestGraphics.visible = false;
+	boat.manifestGraphics.off("mouseenter")
+	boat.manifestGraphics.off("mouseleave")
 }
