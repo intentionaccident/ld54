@@ -4,6 +4,18 @@ import {Lane} from "./Lane";
 import {Configuration} from "./Configuration";
 import {weightedSample} from "./random";
 
+export const boatTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/ship.gif').castToBaseTexture(), new PIXI.Rectangle(
+		890, 22, 380, 122
+	)
+);
+
+export const boatManifestTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/manifest.gif').castToBaseTexture(), new PIXI.Rectangle(
+		992, 380, 240, 260
+	)
+);
+
 export enum BoatLocation {
 	Lane,
 	Hand,
@@ -16,7 +28,8 @@ export interface Boat {
 	lane?: Lane;
 	lastFilled: number
 	crates: Crate[];
-	graphics: PIXI.Graphics;
+	boatGraphics: PIXI.Sprite;
+	manifestGraphics: PIXI.Sprite;
 	moorIndex?: number;
 }
 
@@ -28,44 +41,55 @@ export function getBoatWidth(boat: Boat): number {
 	return CRATE_WIDTH
 }
 
+export function cratePositionOnBoat(i: number, max: number): { x: number, y: number } {
+	const originX = 66;
+	const originY = 80;
+	const pointX = 62;
+	const pointY = 60;
+	let directionX = pointX - originX;
+	let directionY = pointY - originY;
+	let length = Math.sqrt(directionX ** 2 + directionY ** 2);
+	directionX = directionX / length;
+	directionY = directionY / length;
+	length *= 6;
+	const offset = length * ((i + 0.2) / max);
+	return {x: originX - directionX * offset, y: originY - directionY * offset};
+}
+
 export function createBoat(configuration: Configuration, size?: number) {
 	size ??= weightedSample(configuration.boatSpawningDistribution) ?? 3;
 	const boat: Boat = {
 		size,
 		crates: [],
 		lastFilled: size,
-		graphics: new PIXI.Graphics(),
+		boatGraphics: new PIXI.Sprite(boatTexture),
+		manifestGraphics: new PIXI.Sprite(boatManifestTexture),
 		location: BoatLocation.Deck
 	};
 
-	boat.graphics.beginFill(0xaaaaaa, 1);
-	boat.graphics.drawEllipse(getBoatLength(boat) / 2, getBoatWidth(boat) / 2, getBoatLength(boat) / 2, getBoatWidth(boat));
-	// boat.graphics.drawRect(0, 0, getBoatLength(boat), CRATE_WIDTH);
-	boat.graphics.endFill();
+	boat.manifestGraphics.interactive = true;
 
-	boat.graphics.interactive = true;
-	boat.graphics.eventMode = 'static';
-	boat.graphics.hitArea = new PIXI.Ellipse(
-		CRATE_WIDTH * size / 2,
-		CRATE_WIDTH / 2,
-		CRATE_WIDTH * size / 2,
-		CRATE_WIDTH
-	)
-
-	while (size-- > 0) {
+	for (let i = 0; i < size; i++) {
 		const weight = (c: CrateType) => configuration.enabledCrateTypes.indexOf(c) === -1 ? 0 : 1;
-		const crate = createCrate(weightedSample([
+		let crateType = weightedSample([
 			[weight(CrateType.Circle), CrateType.Circle],
 			[weight(CrateType.Square), CrateType.Square],
 			[weight(CrateType.Triangle), CrateType.Triangle],
 			[weight(CrateType.Cross), CrateType.Cross],
 			[configuration.enableJokerCrateBoats ? 0.5 : 0, CrateType.Joker],
-		]) ?? CrateType.Circle);
-		crate.graphics.x = boat.crates.length * CRATE_WIDTH + CRATE_WIDTH/2;
-		crate.graphics.y += CRATE_WIDTH/2;
+		]) ?? CrateType.Circle;
+		const manifestCrate = createCrate(crateType, false);
+		manifestCrate.graphics.x = cratePositionOnBoat(i, size).x;
+		manifestCrate.graphics.y = cratePositionOnBoat(i, size).y;
+		manifestCrate.graphics.alpha = 1;
+		boat.manifestGraphics.addChild(manifestCrate.graphics);
+
+		const crate = createCrate(crateType, false);
+		crate.graphics.x = 94 + i * 50;
+		crate.graphics.y = 100;
 		crate.graphics.alpha = 0.5;
+		boat.boatGraphics.addChild(crate.graphics);
 		boat.crates.push(crate);
-		boat.graphics.addChild(crate.graphics);
 	}
 
 	return boat;

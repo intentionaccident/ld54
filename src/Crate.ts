@@ -37,14 +37,16 @@ const colorMap = {
 	[CrateType.Joker]: 0xFFFF00,
 };
 
-export function createCrate(type: CrateType): Crate {
+export function createCrate(type: CrateType, includeWagon: boolean = true): Crate {
 	const container = new PIXI.Container();
 	const graphics = new PIXI.Graphics();
 	// container.addChild(graphics);
-	let wagonSprite = new PIXI.Sprite(wagonTexture);
-	wagonSprite.anchor.set(0.5, 0.5);
-	wagonSprite.y = 8;
-	container.addChild(wagonSprite);
+	if (includeWagon) {
+		let wagonSprite = new PIXI.Sprite(wagonTexture);
+		wagonSprite.anchor.set(0.5, 0.5);
+		wagonSprite.y = 8;
+		container.addChild(wagonSprite);
+	}
 	const crateSprite = new PIXI.Sprite(cratesTextures[type]);
 	crateSprite.anchor.set(0.5, 0.5);
 	container.addChild(crateSprite)
