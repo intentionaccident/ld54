@@ -11,6 +11,7 @@
   "dependencies": {
     "@pixi/filter-grayscale": "^5.1.1",
     "@pixi/graphics-extras": "^7.3.1",
+    "@pixi/sound": "^5.2.1",
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.2",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.8",

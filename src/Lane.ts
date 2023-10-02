@@ -9,6 +9,7 @@ import {tick} from "./tick";
 import {interchangeTexture, Slot, slotTexture} from "./Slot";
 import {GrayscaleFilter} from "@pixi/filter-grayscale";
 import {VIEW_HEIGHT} from "./view";
+import {bellSound, matchSound} from "./sounds";
 
 const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
 const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe2.png');
@@ -82,6 +83,7 @@ export function incrementLevel(state: GameState) {
 	}
 	state.boatManager!.reset();
 	state.onLevelChanged()
+	bellSound.play()
 }
 
 export function setLevel(state: GameState, value: number) {
@@ -438,6 +440,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		buttonPipe.visible = true;
 		buttonSmokingPipe.visible = false;
 	});
+	button.on('mouseenter', () => matchSound.play());
 	const width = 210;
 	const height = 170;
 	button.hitArea = new PIXI.Rectangle(
