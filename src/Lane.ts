@@ -7,7 +7,7 @@ import {weightedSample} from "./random";
 import {Features} from "./Features";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
-import {addCrate, Slot} from "./Slot";
+import {Slot} from "./Slot";
 
 export interface ActionButton {
 	action: Action;
@@ -90,7 +90,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
-			addCrate(slot, createRandomCrate(gameState.features, cratePool));
+			slot.addCrate(createRandomCrate(gameState.features, cratePool));
 		}
 	}
 }

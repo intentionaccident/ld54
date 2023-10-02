@@ -104,22 +104,23 @@ export class Slot {
 		this.ability = ability;
 		this.graphics.alpha = 0.7;
 	}
+
+	public addCrate(crate: Crate | null) {
+		if (this.crate !== null) throw Error("`slot` is not empty.");
+		if (crate === null) return;
+		this.crate = crate;
+		this.graphics.addChild(crate.graphics);
+		crate.graphics.y = this.graphics.height / 2 - this.crate.graphics.height / 2;
+		crate.graphics.x = this.graphics.width / 2 - this.crate.graphics.width / 2;
+	}
+
+	public destroyCrate() {
+		if (this.crate === null) throw Error("`slot` is empty.");
+		this.crate.graphics.destroy();
+		this.crate = null;
+	}
 }
 
-export function addCrate(slot: Slot, crate: Crate | null) {
-	if (slot.crate !== null) throw Error("`slot` is not empty.");
-	if (crate === null) return;
-	slot.crate = crate;
-	slot.graphics.addChild(crate.graphics);
-	crate.graphics.y = slot.graphics.height / 2 - slot.crate.graphics.height / 2;
-	crate.graphics.x = slot.graphics.width / 2 - slot.crate.graphics.width / 2;
-}
-
-export function destroyCrate(slot: Slot) {
-	if (slot.crate === null) throw Error("`slot` is empty.");
-	slot.crate.graphics.destroy();
-	slot.crate = null;
-}
 
 export function moveCrate(from: Slot, to: Slot) {
 	if (to.crate !== null) throw Error("`to` is not empty.");
