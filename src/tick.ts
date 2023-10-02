@@ -1,9 +1,10 @@
-import {Action, decrementLives, destroyCrate, incrementScore, Lane, moveCrate, spawnCrateLine, swapCrate} from "./Lane";
+import {Action, decrementLives, incrementScore, Lane, spawnCrateLine} from "./Lane";
 import * as PIXI from "pixi.js";
 import {CrateType} from "./Crate";
 import {GameState} from "./GameState";
 import {deactivateAbility} from "./AbilityBar";
 import {CompressType, FlushType} from "./Features";
+import {destroyCrate, moveCrate, swapCrate} from "./Slot";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 	if (lane.lockTurnsLeft > 1) {

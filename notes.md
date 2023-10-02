@@ -12,3 +12,12 @@ Ships that take nothing but just block for a few turns
 "tetris hold"
 
 "slow" ability, basically reverse of one tick flush
+
+
+My gameplan
+1. Playtest -> Separate into levels with different diff. and abilites
+2. Animations
+3. Level intro popup (tutorial kinda thingy)
+4. Integrate hand drawn textures
+...
+27. Upgrade menu
