@@ -1,4 +1,4 @@
-import {Action, decrementLives, incrementScore, Lane, spawnCrateLine} from "./Lane";
+import {Action, decrementLives, incrementLevel, incrementProgress, incrementScore, Lane, spawnCrateLine} from "./Lane";
 import * as PIXI from "pixi.js";
 import {CrateType} from "./Crate";
 import {GameState} from "./GameState";
@@ -47,6 +47,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 			decrementLives(gameState);
 		}
 
+		incrementProgress(gameState, 1);
 		gameState.boatManager?.removeBoat(lane);
 	}
 }
@@ -161,5 +162,7 @@ export function tick(gameState: GameState, action: Action) {
 		message.x = gameState.app.renderer.width / gameState.app.stage.scale.x / 2;
 		message.y = gameState.app.renderer.height / gameState.app.stage.scale.y / 2;
 		gameState.app.stage.addChild(message);
+	} else if (gameState.progress.value >= gameState.configuration.shipsNeeded) {
+		incrementLevel(gameState);
 	}
 }

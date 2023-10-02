@@ -23,6 +23,7 @@ export enum FlushType {
 }
 
 export interface Configuration {
+	shipsNeeded: number;
 	boatLookAheadCount: number;
 	fastForwardTicks: number;
 	enabledCrateTypes: CrateType[];
@@ -41,6 +42,7 @@ export interface Configuration {
 }
 
 export const createConfiguration: () => Configuration = () => ({
+	shipsNeeded: 10,
 	boatLookAheadCount: 0, // How many boats to consider, in addition to visible boats when spawning new crates
 	fastForwardTicks: 2,
 	enabledCrateTypes: [CrateType.Circle, CrateType.Square],
@@ -68,6 +70,7 @@ export const createConfiguration: () => Configuration = () => ({
 
 export function advanceLevel(configuration: Configuration, level: number) {
 	if (level === 1) {
+		configuration.shipsNeeded = 10;
 		configuration.boatLookAheadCount = 1;
 		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle];
 		configuration.crateSpawningDistribution = [
@@ -82,6 +85,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[0, 5],
 		];
 	} else if (level === 2) {
+		configuration.shipsNeeded = 9;
 		configuration.crateSpawningDistribution = [
 			[1, 0],
 			[2, 1],
@@ -94,6 +98,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[0, 5],
 		];
 	} else if (level === 3) {
+		configuration.shipsNeeded = 8;
 		configuration.boatLookAheadCount = 2;
 		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle, CrateType.Cross];
 		configuration.crateSpawningDistribution = [

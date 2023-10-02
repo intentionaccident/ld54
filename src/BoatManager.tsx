@@ -6,7 +6,7 @@ import {Lane} from "./Lane";
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
-	public readonly boats: Boat[] = [];
+	public boats: Boat[] = [];
 
 	constructor(private readonly gameState: GameState) {
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
@@ -106,6 +106,25 @@ export class BoatManager {
 			boats = this.boats.filter(b => b.location === BoatLocation.Deck);
 		}
 		return boats.slice(0, this.gameState.configuration.boatLookAheadCount);
+	}
+
+	public reset() {
+		for (const lane of this.gameState.lanes) {
+			if (lane.boat !== undefined) this.removeBoat(lane);
+		}
+		const count = this.boats.length;
+		while (this.boats.length > 0) {
+			this.boats.pop()!.graphics.destroy();
+		}
+		for (let i = 0; i < count; i++) {
+			this.boats.push(createBoat(this.gameState.configuration))
+		}
+		this.drawBoatFromDeck();
+		this.drawBoatFromDeck();
+		for (const lane of this.gameState.lanes) {
+			lane.addBoatButton.visible = false
+			lane.addBoatButton.off("click")
+		}
 	}
 }
 
