@@ -11,7 +11,7 @@ import {Slot, slotTexture} from "./Slot";
 
 export interface ActionButton {
 	action: Action;
-	graphics: PIXI.Graphics;
+	graphics: PIXI.Graphics | PIXI.Sprite;
 }
 
 export interface Lane {
@@ -22,6 +22,24 @@ export interface Lane {
 	lockTurnsLeft: number;
 	button: LaneButton;
 }
+
+export const pushDownButtonTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/trolly-control-top.gif').castToBaseTexture(), new PIXI.Rectangle(
+		160, 32, 70, 64
+	)
+);
+
+export const pushUpButtonTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/trolly-control-bottom.gif').castToBaseTexture(), new PIXI.Rectangle(
+		122, 258, 70, 64
+	)
+);
+
+export const laneButtonTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/garage.gif').castToBaseTexture(), new PIXI.Rectangle(
+		0, 32, 160, 160
+	)
+);
 
 export function incrementScore(state: GameState, value: number) {
 	setScore(state, state.score.value + value);
@@ -161,7 +179,7 @@ export class LaneButton {
 	constructor(
 		gameState: GameState,
 		row: number,
-		private readonly graphics: PIXI.Graphics,
+		private readonly graphics: PIXI.Sprite,
 		private readonly textGraphics: PIXI.Text
 	) {
 		this.showLock();
@@ -204,6 +222,15 @@ export class LaneButton {
 	}
 }
 
+function setButtonAnimations(button: PIXI.Sprite) {
+	button.interactive = true;
+	button.on('mousedown', () => button.tint = 0xADB2A9);
+	button.on('mousemove', () => button.tint = 0xD0D6CB);
+	button.on('mouseup', () => button.tint = 0xD0D6CB);
+	button.on('mouseleave', () => button.tint = 0xffffff);
+	button.cursor = 'pointer';
+}
+
 export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] {
 	const laneCount = 3;
 	const slotCount = 11;
@@ -214,12 +241,15 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
 	const topMargin = pushButtonHeight + 10;
-	let leftMargin = 10 + laneCount * 16;
+	let leftMargin = 40 + laneCount * 16;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
 	for (let row = 0; row < laneCount; row++) {
-		const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
-		laneButton.x = leftMargin;
+		// const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
+		const laneButton = new PIXI.Sprite(laneButtonTexture);
+		setButtonAnimations(laneButton);
+		laneButton.x = leftMargin - 94;
+		laneButton.y = -64;
 		const laneButtonText = new PIXI.Text("", {
 			fontSize: 20,
 			align: 'center'
@@ -253,14 +283,16 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			lane.slots.push(slot);
 
 			if (row === 0) {
-				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
+				const button = new PIXI.Sprite(pushDownButtonTexture);
+				setButtonAnimations(button);
 				button.x = leftMargin + laneButtonWidth + col * slotWidth + 16;
 				button.y = -button.height;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
 				lane.graphics.addChild(button);
 			} else if (row === laneCount - 1) {
-				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
-				button.x = leftMargin + laneButtonWidth + col * slotWidth;
+				const button = new PIXI.Sprite(pushUpButtonTexture);
+				setButtonAnimations(button);
+				button.x = leftMargin + laneButtonWidth + col * slotWidth - 8;
 				button.y = slotHeight;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "up", col}});
 				lane.graphics.addChild(button);
