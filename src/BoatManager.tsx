@@ -20,6 +20,10 @@ export class BoatManager {
 		}
 	}
 
+	public setHandContainerZIndex(i: number) {
+		this.gameState.app.stage.setChildIndex(this.handContainer, i);
+	}
+
 	public drawBoatFromDeck(): Boat | null {
 		const deckBoat = this.boats.find(boat => boat.location === BoatLocation.Deck)
 		if (!deckBoat) {

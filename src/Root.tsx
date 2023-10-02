@@ -18,8 +18,8 @@ export function Root() {
 		antialias: false,
 		backgroundColor: 0x3AC5B9
 	});
-	const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
-	app.stage.addChild(scratch)
+	const water = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
+	app.stage.addChild(water)
 
 	const texture = PIXI.Texture.from('assets/bunny.png');
 	const bunny = new PIXI.Sprite(texture);
@@ -80,6 +80,11 @@ export function Root() {
 	gameState.abilityBar = new AbilityBar(gameState);
 	level.interactive = true;
 	level.on('click', () => incrementLevel(gameState)); // For debugging
+
+	const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
+	app.stage.addChildAt(office, 10);
+
+	gameState.boatManager.setHandContainerZIndex(11);
 
 	setScore(gameState, 0);
 	setLives(gameState, 3);
