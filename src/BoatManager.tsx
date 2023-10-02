@@ -111,7 +111,7 @@ export class BoatManager {
 		return pool;
 	}
 
-	public removeBoat(lane: Lane, shouldDestroy = false) {
+	public removeBoat(lane: Lane, shouldDestroy = true) {
 		if (lane.boat === undefined) throw new Error('`lane.boat` is null.');
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
 		if (shouldDestroy) {
