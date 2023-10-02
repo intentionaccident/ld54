@@ -124,7 +124,7 @@ export class Slot {
 		if (this.crate !== null) throw Error("`slot` is not empty.");
 		if (crate === null) return;
 		this.crate = crate;
-		this.gameState.app.stage.addChildAt(crate.graphics, 11);
+		this.gameState.app.stage.addChild(crate.graphics);
 		crate.graphics.x = this.cratePosition(crate).x;
 		crate.graphics.y = this.cratePosition(crate).y;
 	}

@@ -56,6 +56,9 @@ export function Root() {
 	const water = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
 	app.stage.addChild(water)
 
+	const anchor = new PIXI.Sprite(PIXI.Texture.from('assets/anchor.png'));
+	app.stage.addChild(anchor)
+
 	const texture = PIXI.Texture.from('assets/bunny.png');
 	const bunny = new PIXI.Sprite(texture);
 	bunny.x = app.renderer.width / app.stage.scale.x / 2;
@@ -120,10 +123,10 @@ export function Root() {
 	level.on('click', () => incrementLevel(gameState)); // For debugging
 
 	const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
-	app.stage.addChildAt(office, 11);
+	app.stage.addChildAt(office, 12);
 
-	gameState.boatManager.setHandContainerZIndex(11);
-	gameState.lighthouse.setZIndex(9);
+	gameState.boatManager.setHandContainerZIndex(12);
+	gameState.lighthouse.setZIndex(10);
 
 	setScore(gameState, 0);
 	setLives(gameState, 5);

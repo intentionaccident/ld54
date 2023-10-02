@@ -143,7 +143,7 @@ export class BoatManager {
 
 export function moveBoatToLane(boat: Boat, lane: Lane) {
 	boat.boatGraphics.pivot.set(0, -boat.boatGraphics.height/2);
-	boat.boatGraphics.y = -120;
+	boat.boatGraphics.y = -100;
 	boat.boatGraphics.x = lane.addBoatButton.x;
 	lane.graphics.addChild(boat.boatGraphics);
 }
