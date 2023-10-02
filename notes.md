@@ -25,16 +25,13 @@ idea:
 - Change magnet: select crate, all items in lane moves closer (compresses) around crate
 - "slow" ability, basically reverse of one tick flush
 
+[M] fix deck to adhere to config boat count
+
+[D] Add level popup
+[D] Add ability icons
 
 Add arrow underneath next crate request on ship
-Add score
-
-Add deck
-Add level popup
-Add ability icons
 Add sound effects
-
-Rebalance levels a lil bit (introduce abilites)
 
 Weigh request crate on ship by position
 upcoming pool count should be weighted items
