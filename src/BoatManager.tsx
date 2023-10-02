@@ -15,7 +15,6 @@ export const deckTextures = [
 ];
 
 export class BoatManager {
-	static readonly BOAT_BUFFER = 6;
 	public boats: Boat[] = [];
 	private readonly handContainer: PIXI.Container = new PIXI.Container;
 	private readonly deckGraphics: PIXI.Container;
@@ -23,7 +22,7 @@ export class BoatManager {
 	constructor(private readonly gameState: GameState) {
 		gameState.app.stage.addChild(this.handContainer);
 		this.handContainer.sortableChildren = true;
-		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
+		for (let i = 0; i < gameState.configuration.shipsNeeded; i++) {
 			const boat = createBoat(this.gameState.configuration);
 			this.boats.push(boat);
 		}
@@ -95,6 +94,7 @@ export class BoatManager {
 				})
 			}
 		})
+		this.updateDeckGraphics();
 		return deckBoat
 	}
 
@@ -119,7 +119,6 @@ export class BoatManager {
 			lane.boat.boatGraphics.destroy();
 		}
 		delete lane.boat;
-		this.boats.push(createBoat(this.gameState.configuration));
 	}
 
 	private visibleBoats() {
@@ -128,10 +127,6 @@ export class BoatManager {
 
 	private upcomingBoats() {
 		let boats = this.boats.filter(b => b.location === BoatLocation.Deck);
-		while (boats.length < this.gameState.configuration.boatLookAheadCount) {
-			this.boats.push(createBoat(this.gameState.configuration));
-			boats = this.boats.filter(b => b.location === BoatLocation.Deck);
-		}
 		return boats.slice(0, this.gameState.configuration.boatLookAheadCount);
 	}
 
@@ -139,13 +134,12 @@ export class BoatManager {
 		for (const lane of this.gameState.lanes) {
 			if (lane.boat !== undefined) this.removeBoat(lane);
 		}
-		const count = this.boats.length;
 		while (this.boats.length > 0) {
 			let boat = this.boats.pop()!;
 			boat.boatGraphics.destroy();
 			boat.manifestGraphics.destroy();
 		}
-		for (let i = 0; i < count; i++) {
+		for (let i = 0; i < this.gameState.configuration.shipsNeeded; i++) {
 			this.boats.push(createBoat(this.gameState.configuration))
 		}
 		this.drawBoatFromDeck();
@@ -160,14 +154,17 @@ export class BoatManager {
 		for (let i = 0; i < this.deckGraphics.children.length; i++) {
 			this.deckGraphics.children[i].visible = false;
 		}
-		let progress = this.gameState.progress.value / this.gameState.configuration.shipsNeeded;
-		let shipsLeft = this.gameState.configuration.shipsNeeded - this.gameState.progress.value;
-		if (progress < .40) {
-			this.deckGraphics.children[2].visible = true;
-		} else if (progress < .60) {
-			this.deckGraphics.children[1].visible = true;
-		} else if (shipsLeft > 1) {
-			this.deckGraphics.children[0].visible = true;
+		let shipsInDeck = this.boats.filter(b => b.location === BoatLocation.Deck).length;
+		let progress = shipsInDeck / (this.gameState.configuration.shipsNeeded - 2);
+		console.log(progress)
+		if (shipsInDeck !== 0) {
+			if (progress >= .66) {
+				this.deckGraphics.children[2].visible = true;
+			} else if (progress >= .33) {
+				this.deckGraphics.children[1].visible = true;
+			} else {
+				this.deckGraphics.children[0].visible = true;
+			}
 		}
 	}
 }
