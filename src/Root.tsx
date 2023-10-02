@@ -47,8 +47,20 @@ export class Lighthouse {
 	}
 }
 
+enum LetterType {
+	Intro,
+	Death,
+	LevelAdvance
+}
+
+const messages: Record<LetterType, string> = {
+	[LetterType.Death]: "Due to gross negligence and loss of cargo we regret to announce your immediate dismissal from the position of Harbour Master. Good luck in future ventures.",
+	[LetterType.Intro]: "Welcome to the Port. You must deliver the requested goods to the ships in the correct order. Make sure not to misload the ships or drop any cargo into the harbour, the lighthouse man will be keeping count of the missed shipments.",
+	[LetterType.LevelAdvance]: "Attached are the manifests of the ship for today, %/08/1923"
+}
+
 export function Root() {
-	const [text, setText] = React.useState<string | null>("Hello World")
+	const [text, setText] = React.useState<LetterType | null>(LetterType.Intro)
 	const app = new PIXI.Application({
 		width: 1280,
 		height: 640,
@@ -142,7 +154,7 @@ export function Root() {
 	return <div>
 		<GameFrame>
 			<PixiRoot app={app} />
-			{text && <UIRoot text={text} close={() => setText(null)} />}
+			{text != null && <UIRoot text={messages[text].replace("%", gameState.level.value.toString())} close={() => setText(null)} />}
 		</GameFrame>
 	</div>;
 }
