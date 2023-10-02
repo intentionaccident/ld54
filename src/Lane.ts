@@ -47,7 +47,7 @@ export const pushUpButtonTexture = new PIXI.Texture(
 
 export const laneButtonTextures = [1,2,3].map(i => new PIXI.Texture(
 	PIXI.Texture.from(`assets/garage${i}.png`).castToBaseTexture(), new PIXI.Rectangle(
-		0, 32, 160, 160
+		0, 0, 160, 160+32
 	)
 ));
 
@@ -307,7 +307,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		}
 		setButtonAnimations(laneButton, laneButton.children as PIXI.Sprite[]);
 		laneButton.x = leftMargin - 94;
-		laneButton.y = -64;
+		laneButton.y = -64-32;
 		const laneButtonText = new PIXI.Text("", {
 			fontSize: 20,
 			align: 'center'
