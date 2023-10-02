@@ -283,6 +283,17 @@ function createAddBoatButton(): PIXI.Sprite {
 	graphics.interactive = true;
 	graphics.cursor = "pointer";
 	graphics.alpha = 0.5;
+	const offset = 30;
+	graphics.hitArea = new PIXI.Rectangle(
+		0, offset,
+		graphics.width, graphics.height - offset
+	);
+	graphics.on('mousemove', () => {
+		graphics.alpha= 0.8;
+	});
+	graphics.on('mouseleave', () => {
+		graphics.alpha= 0.5;
+	});
 	return graphics;
 }
 
