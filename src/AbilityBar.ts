@@ -67,17 +67,16 @@ export function activateAbility(state:GameState, ability: AbilityType) {
 
 export class AbilityBar {
 	private readonly abilities: [string, AbilityType][] = [
-		["⏩", AbilityType.FastForward],
+		// ["⏩", AbilityType.FastForward],
 		["🧲", AbilityType.Compress],
 		["🏗", AbilityType.Swap],
 		["🌊", AbilityType.Flush],
-		["🕸", AbilityType.Hold],
 	];
 	private readonly buttons: PIXI.Graphics[] = [];
 	constructor(private readonly state: GameState) {
-		for (let i = 0; i < 5; i++) {
+		for (let i = 0; i < this.abilities.length; i++) {
 			const button = createBox(100, 100, 0xFFFFFF, true);
-			button.y = VIEW_HEIGHT - button.height;
+			button.y = VIEW_HEIGHT - button.height - 40;
 			button.x = 200 + (button.width) * i;
 			state.app.stage.addChild(button);
 			this.buttons.push(button);
