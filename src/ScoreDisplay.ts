@@ -35,17 +35,17 @@ export class ScoreDisplay {
 		}
 
 		if (score < 3) {
-		} else if (score < 25) {
-			this.container.children[0].visible = true;
 		} else if (score < 50) {
-			this.container.children[1].visible = true;
-		} else if (score < 75) {
-			this.container.children[2].visible = true;
+			this.container.children[0].visible = true;
 		} else if (score < 100) {
-			this.container.children[3].visible = true;
+			this.container.children[1].visible = true;
 		} else if (score < 150) {
-			this.container.children[4].visible = true;
+			this.container.children[2].visible = true;
 		} else if (score < 200) {
+			this.container.children[3].visible = true;
+		} else if (score < 300) {
+			this.container.children[4].visible = true;
+		} else if (score < 500) {
 			this.container.children[5].visible = true;
 		}
 	}

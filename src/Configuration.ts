@@ -42,7 +42,7 @@ export interface Configuration {
 }
 
 export const createConfiguration: () => Configuration = () => ({
-	shipsNeeded: 10,
+	shipsNeeded: 8,
 	boatLookAheadCount: 0, // How many boats to consider, in addition to visible boats when spawning new crates
 	fastForwardTicks: 2,
 	enabledCrateTypes: [CrateType.Circle, CrateType.Square],
@@ -53,7 +53,7 @@ export const createConfiguration: () => Configuration = () => ({
 	jokerCrateChance: 1 / 20,
 	craneType: CraneType.OnlyEmpty,
 	cranePattern: CranePattern.SameLane,
-	craneRange: 1, // Only applies to CranePattern.Cross and CranePattern.SameLane
+	craneRange: 2, // Only applies to CranePattern.Cross and CranePattern.SameLane
 	compressType: CompressType.EatGaps,
 	flushType: FlushType.Full,
 	crateSpawningDistribution: [
@@ -66,16 +66,16 @@ export const createConfiguration: () => Configuration = () => ({
 		[1, 2],
 		[0, 3],
 	],
-	unlockedAbilities: [AbilityType.FastForward, AbilityType.Compress, AbilityType.Swap, AbilityType.Flush]
+	unlockedAbilities: []
 });
 
 export function advanceLevel(configuration: Configuration, level: number) {
 	if (level === 1) {
-		configuration.shipsNeeded = 10;
+		configuration.shipsNeeded = 6;
 		configuration.boatLookAheadCount = 1;
 		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle];
 		configuration.crateSpawningDistribution = [
-			[3, 0],
+			[2, 0],
 			[3, 1],
 			[1, 2],
 		];
@@ -86,9 +86,24 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[0, 5],
 		];
 	} else if (level === 2) {
-		configuration.shipsNeeded = 9;
+		configuration.shipsNeeded = 6;
+		configuration.boatLookAheadCount = 1;
 		configuration.crateSpawningDistribution = [
-			[1, 0],
+			[2, 0],
+			[3, 1],
+			[1, 2],
+		];
+		configuration.boatSpawningDistribution = [
+			[1, 2],
+			[2, 3],
+			[0, 4],
+			[0, 5],
+		];
+		configuration.unlockedAbilities = [AbilityType.Flush];
+	} else if (level === 3) {
+		configuration.shipsNeeded = 6;
+		configuration.crateSpawningDistribution = [
+			[2, 0],
 			[2, 1],
 			[1, 2],
 		];
@@ -98,23 +113,65 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[1, 4],
 			[0, 5],
 		];
-	} else if (level === 3) {
-		configuration.shipsNeeded = 8;
+		configuration.unlockedAbilities = [AbilityType.Flush, AbilityType.Compress];
+	} else if (level === 4) {
+		configuration.shipsNeeded = 6;
+		configuration.crateSpawningDistribution = [
+			[2, 0],
+			[2, 1],
+			[1, 2],
+		];
+		configuration.boatSpawningDistribution = [
+			[0.5, 2],
+			[1, 3],
+			[1, 4],
+			[0, 5],
+		];
+	} else if (level === 5) {
+		configuration.shipsNeeded = 6;
 		configuration.boatLookAheadCount = 2;
-		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle, CrateType.Cross];
 		configuration.crateSpawningDistribution = [
 			[1, 0],
 			[2, 1],
-			[2, 2],
+			[1, 2],
 		];
 		configuration.boatSpawningDistribution = [
 			[0, 2],
 			[1, 3],
 			[1, 4],
-			[1, 5],
+			[0.5, 5],
 		];
 		configuration.unlockedAbilities = [
-			AbilityType.FastForward, AbilityType.Compress, AbilityType.Swap, AbilityType.Flush
+			AbilityType.Compress, AbilityType.Swap, AbilityType.Flush
 		]
-	} else throw new Error("Level not implemented.");
+	} else if (level === 6) {
+		configuration.shipsNeeded = 6;
+		configuration.crateSpawningDistribution = [
+			[0, 0],
+			[2, 1],
+			[1, 2],
+		];
+		configuration.boatSpawningDistribution = [
+			[0, 2],
+			[1, 3],
+			[1, 4],
+			[0.5, 5],
+		];
+	} else if (level === 7) {
+		configuration.shipsNeeded = 5;
+		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle, CrateType.Cross];
+		configuration.crateSpawningDistribution = [
+			[0, 0],
+			[2, 1],
+			[1, 2],
+		];
+		configuration.boatSpawningDistribution = [
+			[0, 2],
+			[1, 3],
+			[1, 4],
+			[0.5, 5],
+		];
+	} else {
+		configuration.shipsNeeded += 5;
+	}
 }
