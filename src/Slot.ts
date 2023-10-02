@@ -140,6 +140,7 @@ export class Slot {
 		if (this.crate === null) throw Error("`slot` is empty.");
 		this.crate.isDead = true;
 		const crate = this.crate;
+		crate.fadeAfter = this.cratePosition(crate).x;
 		if (crate.lanePath.length > 0) {
 			crate.lanePath[crate.lanePath.length - 1].x = this.cratePosition(crate).x + 100;
 		} else {
@@ -189,6 +190,9 @@ export function animateCrate(crate: Crate, isLane: boolean) {
 			) {
 				path.splice(0, 1);
 			}
+		}
+		if (crate.graphics.x > crate.fadeAfter) {
+			crate.graphics.alpha *= 0.90;
 		}
 		return path.length > 0;
 	};

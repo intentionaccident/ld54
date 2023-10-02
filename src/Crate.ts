@@ -27,6 +27,7 @@ export interface Crate {
 	actionPath: { x: number, y: number }[];
 	lanePath: { x: number, y: number }[];
 	isDead: boolean;
+	fadeAfter: number;
 }
 
 const colorMap = {
@@ -92,6 +93,7 @@ export function createCrate(type: CrateType, includeWagon: boolean = true): Crat
 		graphics: container,
 		actionPath: [],
 		lanePath: [],
-		isDead: false
+		isDead: false,
+		fadeAfter: 1000
 	};
 }
