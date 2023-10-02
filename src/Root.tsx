@@ -121,13 +121,9 @@ export function Root() {
 		lighthouse: new Lighthouse(app),
 		onDeath: () => setText(LetterType.Death)
 	};
-	let fpsCounter = new PIXI.Text();
-	fpsCounter.x = 200;
-	app.stage.addChild(fpsCounter);
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
-		fpsCounter.text = `${app.ticker.FPS}\n${app.ticker.minFPS}\n${app.ticker.maxFPS}\n${app.ticker.elapsedMS}\n${app.ticker.deltaMS}`;
-		animate(gameState);
+		animate(gameState, app.ticker);
 	});
 
 	gameState.boatManager = new BoatManager(gameState)
@@ -155,8 +151,6 @@ export function Root() {
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
-
-	app.stage.setChildIndex(fpsCounter, app.stage.children.length - 1);
 
 	return <div>
 		<GameFrame>

@@ -1,20 +1,25 @@
 import {GameState} from "./GameState";
+import * as PIXI from "pixi.js";
 
-export function animate(gameState: GameState) {
+const frameRateMS = 1000/140;
+let timeLeft = frameRateMS;
+
+export function animate(gameState: GameState, ticker: PIXI.Ticker) {
 	if (gameState.popupIsActive) return;
 
-	if (gameState.nonBlockingAnimations.length > 0) {
-		animateNonBlockingAnimations(gameState);
-	}
+	timeLeft -= ticker.elapsedMS;
 
-	if (gameState.actionAnimations.length > 0) {
-		animateActions(gameState);
-		return;
-	}
+	while (timeLeft < 0) {
+		if (gameState.nonBlockingAnimations.length > 0) {
+			animateNonBlockingAnimations(gameState);
+		}
 
-	if (gameState.laneAnimations.length > 0) {
-		animateLanes(gameState);
-		return;
+		if (gameState.actionAnimations.length > 0) {
+			animateActions(gameState);
+		} else if (gameState.laneAnimations.length > 0) {
+			animateLanes(gameState);
+		}
+		timeLeft += frameRateMS;
 	}
 }
 
