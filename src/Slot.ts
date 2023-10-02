@@ -1,9 +1,10 @@
-import {Crate} from "./Crate";
+import {Crate, createCrate} from "./Crate";
 import {AbilityType} from "./AbilityBar";
 import {GameState} from "./GameState";
 import * as PIXI from "pixi.js";
 import {CranePattern, CraneType} from "./Configuration";
 import {tick} from "./tick";
+import {animate} from "./animate";
 
 export class Slot {
 	private ability: AbilityType | null = null;
@@ -36,14 +37,14 @@ export class Slot {
 							if (this.gameState.configuration.cranePattern === CranePattern.Anywhere) {
 								enableSlotIfEmpty(slot);
 							} else if (this.gameState.configuration.cranePattern === CranePattern.SameLane) {
-								for (let i = 1; i < this.gameState.configuration.craneRange+1; i++) {
+								for (let i = 1; i < this.gameState.configuration.craneRange + 1; i++) {
 									if (
 										(row === this.row() && col === this.col() - i)
 										|| (row === this.row() && col === this.col() + i)
 									) enableSlotIfEmpty(slot);
 								}
 							} else if (this.gameState.configuration.cranePattern === CranePattern.Cross) {
-								for (let i = 1; i < this.gameState.configuration.craneRange+1; i++) {
+								for (let i = 1; i < this.gameState.configuration.craneRange + 1; i++) {
 									if (
 										(row === this.row() && col === this.col() - i)
 										|| (row === this.row() && col === this.col() + i)
@@ -109,35 +110,73 @@ export class Slot {
 		if (this.crate !== null) throw Error("`slot` is not empty.");
 		if (crate === null) return;
 		this.crate = crate;
-		this.graphics.addChild(crate.graphics);
-		crate.graphics.y = this.graphics.height / 2 - this.crate.graphics.height / 2;
-		crate.graphics.x = this.graphics.width / 2 - this.crate.graphics.width / 2;
+		this.gameState.app.stage.addChild(crate.graphics);
+		crate.graphics.x = this.cratePosition(crate).x;
+		crate.graphics.y = this.cratePosition(crate).y;
+	}
+
+	public cratePosition(crate: Crate): { x: number, y: number } {
+		return {
+			x: this.graphics.getGlobalPosition().x / 2 + this.graphics.width / 2,
+			y: this.graphics.getGlobalPosition().y / 2 + this.graphics.height / 2
+		};
 	}
 
 	public destroyCrate() {
 		if (this.crate === null) throw Error("`slot` is empty.");
-		this.crate.graphics.destroy();
+		this.crate.isDead = true;
+		const crate = this.crate;
+		this.gameState.laneAnimations.push(() => {
+			if (crate.lanePath.length === 0 && crate.actionPath.length === 0) {
+				crate.graphics.destroy();
+				return false;
+			}
+			return true;
+		})
 		this.crate = null;
 	}
 }
 
 
-export function moveCrate(from: Slot, to: Slot) {
+export function moveCrate(gameState: GameState, from: Slot, to: Slot, isLane: boolean) {
 	if (to.crate !== null) throw Error("`to` is not empty.");
 	if (from.crate === null) return;
-	to.crate = from.crate;
-	to.graphics.addChild(from.crate.graphics);
+	let crate = from.crate;
+	to.crate = crate;
 	from.crate = null;
+
+	(isLane ? crate.lanePath : crate.actionPath).push(to.cratePosition(crate));
+	(isLane ? gameState.laneAnimations : gameState.actionAnimations).push(animateCrate(crate, isLane));
 }
 
-export function swapCrate(from: Slot, to: Slot) {
-	if (from.crate !== null) {
-		from.crate.graphics.removeFromParent();
-		to.graphics.addChild(from.crate.graphics);
-	}
-	if (to.crate !== null) {
-		to.crate.graphics.removeFromParent();
-		from.graphics.addChild(to.crate.graphics);
-	}
+function animateCrate(crate: Crate, isLane: boolean) {
+	return () => {
+		const path = isLane ? crate.lanePath : crate.actionPath;
+		if (path.length > 0) {
+			const {x: targetX, y: targetY} = path[0];
+			crate.graphics.x += (targetX - crate.graphics.x) / 5;
+			crate.graphics.y += (targetY - crate.graphics.y) / 5;
+			const epsilon = 10e-3;
+			if (
+				Math.abs(targetX - crate.graphics.x) < epsilon
+				&& Math.abs(crate.graphics.y - targetY) < epsilon
+			) {
+				path.splice(0, 1);
+			}
+		}
+		return path.length > 0;
+	};
+}
+
+export function swapCrate(gameState: GameState, from: Slot, to: Slot) {
 	[to.crate, from.crate] = [from.crate, to.crate];
+	if (from.crate !== null) {
+		from.crate.actionPath.push(from.cratePosition(from.crate));
+		gameState.actionAnimations.push(animateCrate(from.crate, false));
+	}
+
+	if (to.crate !== null) {
+		to.crate.actionPath.push(to.cratePosition(to.crate));
+		gameState.actionAnimations.push(animateCrate(to.crate, false));
+	}
 }

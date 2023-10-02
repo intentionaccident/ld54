@@ -6,7 +6,7 @@ import {deactivateAbility} from "./AbilityBar";
 import {CompressType, FlushType} from "./Configuration";
 import {moveCrate, swapCrate} from "./Slot";
 
-function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
+function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane = true) {
 	if (lane.lockTurnsLeft > 1) {
 		lane.button.showLocked(lane.lockTurnsLeft);
 	} else {
@@ -19,7 +19,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 		if (lane.slots[col].crate === null) continue;
 
 		if (col !== lane.slots.length - 1) {
-			moveCrate(lane.slots[col], lane.slots[col + 1]);
+			moveCrate(gameState, lane.slots[col], lane.slots[col + 1], isLane);
 			continue;
 		}
 
@@ -53,18 +53,20 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 }
 
 export function tick(gameState: GameState, action: Action) {
+	if (gameState.laneAnimations.length > 0 || gameState.actionAnimations.length > 0) return;
+
 	deactivateAbility(gameState);
 	const lanes = gameState.lanes;
 	if (action.type === "push" && action.dir === "up") {
 		for (let row = 0; row < lanes.length - 1; row++) {
 			if (lanes[row].slots[action.col].crate === null) {
-				moveCrate(lanes[row + 1].slots[action.col], lanes[row].slots[action.col]);
+				moveCrate(gameState, lanes[row + 1].slots[action.col], lanes[row].slots[action.col], false);
 			}
 		}
 	} else if (action.type === "push" && action.dir === "down") {
 		for (let row = lanes.length - 1; row > 0; row--) {
 			if (lanes[row].slots[action.col].crate === null) {
-				moveCrate(lanes[row - 1].slots[action.col], lanes[row].slots[action.col]);
+				moveCrate(gameState, lanes[row - 1].slots[action.col], lanes[row].slots[action.col], false);
 			}
 		}
 	} else if (action.type === "lock") {
@@ -75,7 +77,7 @@ export function tick(gameState: GameState, action: Action) {
 		}
 	} else if (action.type === "fast-forward") {
 		for (let i = 0; i < gameState.configuration.fastForwardTicks; i++) {
-			moveLaneForward(gameState, lanes[action.row]);
+			moveLaneForward(gameState, lanes[action.row], 0, false);
 		}
 		lanes[action.row].lockTurnsLeft = 1;
 	} else if (action.type === "compress") {
@@ -86,7 +88,7 @@ export function tick(gameState: GameState, action: Action) {
 				if (slot.crate === null) {
 					for (let j = i + 1; j < lane.slots.length; j++) {
 						if (lane.slots[j].crate !== null) {
-							moveCrate(lane.slots[j], slot);
+							moveCrate(gameState, lane.slots[j], slot, false);
 							break;
 						}
 					}
@@ -116,14 +118,14 @@ export function tick(gameState: GameState, action: Action) {
 			while (lane.slots[gapLeftmostCol].crate === null) {
 				for (let col = gapLeftmostCol + 1; col < lane.slots.length; col++) {
 					if (lane.slots[col].crate !== null) {
-						moveCrate(lane.slots[col], lane.slots[col-1]);
+						moveCrate(gameState, lane.slots[col], lane.slots[col-1], false);
 					}
 				}
 			}
 		} else throw new Error("Unreachable.");
 		lane.lockTurnsLeft = 1;
 	} else if (action.type === "swap") {
-		swapCrate(action.from, action.to);
+		swapCrate(gameState, action.from, action.to);
 	} else if (action.type === "flush") {
 		const lane = gameState.lanes[action.from.row()];
 		let flushTicks = -1;

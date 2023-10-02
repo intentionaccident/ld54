@@ -61,7 +61,8 @@ export function createBoat(configuration: Configuration, size?: number) {
 			[weight(CrateType.Cross), CrateType.Cross],
 			[configuration.enableJokerCrateBoats ? 0.5 : 0, CrateType.Joker],
 		]) ?? CrateType.Circle);
-		crate.graphics.x = boat.crates.length * CRATE_WIDTH;
+		crate.graphics.x = boat.crates.length * CRATE_WIDTH + CRATE_WIDTH/2;
+		crate.graphics.y += CRATE_WIDTH/2;
 		crate.graphics.alpha = 0.5;
 		boat.crates.push(crate);
 		boat.graphics.addChild(crate.graphics);
