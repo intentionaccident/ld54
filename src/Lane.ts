@@ -46,7 +46,7 @@ export const pushUpButtonTexture = new PIXI.Texture(
 );
 
 export const laneButtonTexture = new PIXI.Texture(
-	PIXI.Texture.from('assets/garage.gif').castToBaseTexture(), new PIXI.Rectangle(
+	PIXI.Texture.from('assets/garage1.png').castToBaseTexture(), new PIXI.Rectangle(
 		0, 32, 160, 160
 	)
 );
