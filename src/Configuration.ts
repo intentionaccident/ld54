@@ -66,7 +66,7 @@ export const createConfiguration: () => Configuration = () => ({
 		[1, 2],
 		[0, 3],
 	],
-	unlockedAbilities: []
+	unlockedAbilities: [AbilityType.Compress]
 });
 
 export function advanceLevel(configuration: Configuration, level: number) {

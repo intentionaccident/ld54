@@ -1,15 +1,14 @@
 import * as PIXI from "pixi.js";
-import { createBox } from "./Box";
-import { Crate, CrateType, CrateTypes, createCrate } from "./Crate";
-import { Boat, boatTexture } from "./Boat";
-import { GameState } from "./GameState";
-import { weightedSample } from "./random";
-import { advanceLevel, Configuration } from "./Configuration";
-import { AbilityType } from "./AbilityBar";
-import { tick } from "./tick";
-import { interchangeTexture, Slot, slotTexture } from "./Slot";
-import { GrayscaleFilter } from "@pixi/filter-grayscale";
-import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
+import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
+import {Boat, boatTexture} from "./Boat";
+import {GameState} from "./GameState";
+import {weightedSample} from "./random";
+import {advanceLevel, Configuration} from "./Configuration";
+import {AbilityType} from "./AbilityBar";
+import {tick} from "./tick";
+import {interchangeTexture, Slot, slotTexture} from "./Slot";
+import {GrayscaleFilter} from "@pixi/filter-grayscale";
+import {VIEW_HEIGHT} from "./view";
 
 const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
 const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe2.png');
@@ -217,7 +216,7 @@ export class LaneButton {
 	public showFastForward() {
 		this.textGraphics.text = "⏩";
 		this.ability = AbilityType.FastForward;
-		for (let i = 0; i < this.graphics.children.length; i++) {
+		for (let i = 0; i < this.graphics.children.length-1; i++) {
 			this.graphics.children[i].visible = false;
 		}
 		this.graphics.children[0].visible = true;
@@ -226,7 +225,7 @@ export class LaneButton {
 	public showCompress() {
 		this.textGraphics.text = "🧲";
 		this.ability = AbilityType.Compress;
-		for (let i = 0; i < this.graphics.children.length; i++) {
+		for (let i = 0; i < this.graphics.children.length-1; i++) {
 			this.graphics.children[i].visible = false;
 		}
 		this.graphics.children[0].visible = true;
@@ -235,14 +234,17 @@ export class LaneButton {
 	public showLock() {
 		this.textGraphics.text = "";
 		this.ability = AbilityType.Lock;
-		for (let i = 0; i < this.graphics.children.length; i++) {
+		for (let i = 0; i < this.graphics.children.length-1; i++) {
 			this.graphics.children[i].visible = false;
 		}
 		this.graphics.children[0].visible = true;
 	}
 
-	public showLocked(turnsLeft: number) {;
+	public showLocked(turnsLeft: number) {
 		this.ability = AbilityType.Lock;
+		for (let i = 0; i < this.graphics.children.length-1; i++) {
+			this.graphics.children[i].visible = false;
+		}
 		this.graphics.children[2].visible = true;
 	}
 }
@@ -320,16 +322,16 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		setButtonAnimations(laneButton, laneButton.children as PIXI.Sprite[]);
 
 		const showTexture = (i: number) => {
-			for (let child of laneButton.children) {
-				child.visible = false;
+			for (let j = 0; j < laneButton.children.length-1; j++){
+				laneButton.children[j].visible = false;
 			}
 			laneButton.children[i].visible = true;
 		}
 		laneButton.on('mousemove', () => {
-			if (lane.lockTurnsLeft === 0) showTexture(1);
+			if (lane.lockTurnsLeft === 0 && lane.button.ability === AbilityType.Lock) showTexture(1);
 		});
 		laneButton.on('mouseleave', () => {
-			if (lane.lockTurnsLeft === 0) showTexture(0)
+			if (lane.lockTurnsLeft === 0 && lane.button.ability === AbilityType.Lock) showTexture(0)
 		});
 
 		laneButton.x = leftMargin - 94;
