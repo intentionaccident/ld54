@@ -4,12 +4,16 @@ import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
 import {GameState} from "./GameState";
 import {Lane} from "./Lane";
 import {slotTexture} from "./Slot";
+import * as PIXI from "pixi.js";
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
 	public boats: Boat[] = [];
+	private readonly handContainer: PIXI.Container = new PIXI.Container;
 
 	constructor(private readonly gameState: GameState) {
+		gameState.app.stage.addChild(this.handContainer);
+		this.handContainer.sortableChildren = true;
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
 			const boat = createBoat(this.gameState.configuration);
 			this.boats.push(boat);
@@ -35,7 +39,8 @@ export class BoatManager {
 
 		deckBoat.location = BoatLocation.Hand;
 		deckBoat.moorIndex = index;
-		this.gameState.app.stage.addChild(deckBoat.manifestGraphics);
+		deckBoat.manifestGraphics.zIndex = index;
+		this.handContainer.addChild(deckBoat.manifestGraphics);
 
 
 		deckBoat.manifestGraphics.x = 900 + index * 120;

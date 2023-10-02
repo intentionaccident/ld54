@@ -1,13 +1,14 @@
 import * as PIXI from "pixi.js";
 import {createBox} from "./Box";
 import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
-import {Boat} from "./Boat";
+import {Boat, boatTexture} from "./Boat";
 import {GameState} from "./GameState";
 import {weightedSample} from "./random";
 import {advanceLevel, Configuration} from "./Configuration";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
 import {interchangeTexture, Slot, slotTexture} from "./Slot";
+import {GrayscaleFilter} from "@pixi/filter-grayscale";
 
 export interface ActionButton {
 	action: Action;
@@ -17,7 +18,7 @@ export interface ActionButton {
 export interface Lane {
 	slots: Slot[];
 	graphics: PIXI.Container;
-	addBoatButton: PIXI.Graphics;
+	addBoatButton: PIXI.Sprite;
 	boat?: Boat;
 	lockTurnsLeft: number;
 	button: LaneButton;
@@ -252,6 +253,15 @@ function setButtonAnimations(button: PIXI.Sprite, targets: PIXI.Sprite[]) {
 	button.cursor = 'pointer';
 }
 
+function createAddBoatButton(): PIXI.Sprite {
+	const graphics = new PIXI.Sprite(boatTexture);
+	graphics.filters = [new GrayscaleFilter()];
+	graphics.interactive = true;
+	graphics.cursor = "pointer";
+	graphics.alpha = 0.5;
+	return graphics;
+}
+
 export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] {
 	const laneCount = 3;
 	const slotCount = 11;
@@ -282,13 +292,14 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
 			slots: [],
-			addBoatButton: createBox(slotWidth, pushButtonHeight, 0xffffff, true),
+			addBoatButton: createAddBoatButton(),
 			lockTurnsLeft: 0,
 			button: new LaneButton(gameState, row, laneButton, laneButtonText)
 		};
 
+		lane.addBoatButton.pivot.set(0, -lane.addBoatButton.height/2);
 		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1);
-		lane.addBoatButton.y = 20;
+		lane.addBoatButton.y = -120;
 		lane.addBoatButton.visible = false;
 		lane.graphics.addChild(lane.addBoatButton);
 
