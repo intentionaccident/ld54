@@ -7,7 +7,7 @@ import {weightedSample} from "./random";
 import {advanceLevel, Configuration} from "./Configuration";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
-import {Slot} from "./Slot";
+import {Slot, slotTexture} from "./Slot";
 
 export interface ActionButton {
 	action: Action;
@@ -144,13 +144,12 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 				gameState.laneAnimations.push(() => {
 					crate!.graphics.scale.x += (1 - crate!.graphics.scale.x) / 5;
 					crate!.graphics.scale.y += (1 - crate!.graphics.scale.y) / 5;
-					console.log(crate!.graphics.scale.y )
 					const epsilon = 10e-3;
 					if (Math.abs(1 - crate!.graphics.scale.x) < epsilon) {
 						crate!.graphics.scale.set(1,1)
 						return false;
 					} else return true;
-				})
+				});
 			}
 		}
 	}
@@ -207,10 +206,10 @@ export class LaneButton {
 
 export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] {
 	const laneCount = 3;
-	const slotCount = 8;
-	const laneSpacing = 15;
-	const slotWidth = 50;
-	const slotHeight = 40;
+	const slotCount = 11;
+	const laneSpacing = 0;
+	const slotWidth = 32;
+	const slotHeight = 48;
 	const buttonSize = 25;
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
@@ -243,10 +242,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 
 		lane.graphics.y = topMargin + row * (slotHeight + laneSpacing);
 		for (let col = 0; col < slotCount; col++) {
-			const slotGraphics = createBox(
-				slotWidth, slotHeight,
-				0x9ca28a
-			);
+			const slotGraphics = new PIXI.Sprite(slotTexture);
 			slotGraphics.x = leftMargin + laneButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
 			let slot = new Slot(

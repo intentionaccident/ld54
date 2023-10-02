@@ -6,12 +6,18 @@ import {CranePattern, CraneType} from "./Configuration";
 import {tick} from "./tick";
 import {animate} from "./animate";
 
+export const slotTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/track.gif').castToBaseTexture(), new PIXI.Rectangle(
+		72, 48, 40, 48
+	)
+);
+
 export class Slot {
 	private ability: AbilityType | null = null;
 
 	constructor(
 		private readonly gameState: GameState,
-		public readonly graphics: PIXI.Graphics,
+		public readonly graphics: PIXI.Sprite,
 		public crate: Crate | null = null
 	) {
 		this.graphics.on('click', () => {
@@ -118,7 +124,7 @@ export class Slot {
 	public cratePosition(crate: Crate): { x: number, y: number } {
 		return {
 			x: this.graphics.getGlobalPosition().x / 2 + this.graphics.width / 2,
-			y: this.graphics.getGlobalPosition().y / 2 + this.graphics.height / 2
+			y: this.graphics.getGlobalPosition().y / 2 + this.graphics.height / 2 - 10
 		};
 	}
 

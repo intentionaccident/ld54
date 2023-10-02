@@ -9,10 +9,20 @@ export enum CrateType {
 	Joker
 }
 
+export const CRATE_WIDTH = 16;
 export const CrateTypes = Object.values(CrateType).filter(Number.isInteger) as CrateType[]
 
+const cratesTexture = PIXI.Texture.from('assets/crates.gif');
+export const wagonTexture = new PIXI.Texture(cratesTexture.castToBaseTexture(), new PIXI.Rectangle(
+	0, 0, CRATE_WIDTH, CRATE_WIDTH
+));
+export const cratesTextures = [1,2,3,4].map(i =>
+	new PIXI.Texture(cratesTexture.castToBaseTexture(), new PIXI.Rectangle(
+		CRATE_WIDTH * i, 0, CRATE_WIDTH, CRATE_WIDTH
+	)));
+
 export interface Crate {
-	graphics: PIXI.Graphics;
+	graphics: PIXI.Container;
 	type: CrateType;
 	actionPath: { x: number, y: number }[];
 	lanePath: { x: number, y: number }[];
@@ -27,36 +37,49 @@ const colorMap = {
 	[CrateType.Joker]: 0xFFFF00,
 };
 
-export const CRATE_WIDTH = 20;
 export function createCrate(type: CrateType): Crate {
+	const container = new PIXI.Container();
 	const graphics = new PIXI.Graphics();
+	// container.addChild(graphics);
+	let wagonSprite = new PIXI.Sprite(wagonTexture);
+	wagonSprite.anchor.set(0.5, 0.5);
+	wagonSprite.y = 4;
+	container.addChild(wagonSprite);
+	const crateSprite = new PIXI.Sprite(cratesTextures[type]);
+	crateSprite.anchor.set(0.5, 0.5);
+	container.addChild(crateSprite)
 	// graphics.lineStyle(0); // draw a circle, set the lineStyle to zero so the circle doesn't have an outline
 	graphics.beginFill(colorMap[type], 1);
 	switch (type) {
 		case CrateType.Circle: {
 			graphics.drawCircle(CRATE_WIDTH / 2, CRATE_WIDTH / 2, CRATE_WIDTH / 2);
 			break;
-		} case CrateType.Triangle: {
+		}
+		case CrateType.Triangle: {
 			graphics.drawPolygon([
 				new PIXI.Point(CRATE_WIDTH / 2, 0),
 				new PIXI.Point(CRATE_WIDTH, CRATE_WIDTH),
 				new PIXI.Point(0, CRATE_WIDTH),
 			]);
 			break;
-		} case CrateType.Square: {
+		}
+		case CrateType.Square: {
 			graphics.drawRect(0, 0, CRATE_WIDTH, CRATE_WIDTH);
 			break;
-		} case CrateType.Cross: {
+		}
+		case CrateType.Cross: {
 			graphics.lineStyle(4, colorMap[type], 1)
-				.moveTo(0,0)
-				.lineTo(CRATE_WIDTH/1.5, CRATE_WIDTH/1.5)
-				.moveTo(CRATE_WIDTH/1.5, 0)
-			.lineTo(0, CRATE_WIDTH/1.5);
+				.moveTo(0, 0)
+				.lineTo(CRATE_WIDTH / 1.5, CRATE_WIDTH / 1.5)
+				.moveTo(CRATE_WIDTH / 1.5, 0)
+				.lineTo(0, CRATE_WIDTH / 1.5);
 			break;
-		} case CrateType.Joker: {
-			graphics.drawStar!(20/2/20 * CRATE_WIDTH, 20/2/20 * CRATE_WIDTH, 7, 12/20 * CRATE_WIDTH, 5/20 * CRATE_WIDTH);
+		}
+		case CrateType.Joker: {
+			graphics.drawStar!(20 / 2 / 20 * CRATE_WIDTH, 20 / 2 / 20 * CRATE_WIDTH, 7, 12 / 20 * CRATE_WIDTH, 5 / 20 * CRATE_WIDTH);
 			break;
-		} default: {
+		}
+		default: {
 			throw new Error("Unreachable.");
 		}
 	}
@@ -64,7 +87,7 @@ export function createCrate(type: CrateType): Crate {
 	graphics.pivot.set(graphics.width / 2, graphics.height / 2);
 	return {
 		type,
-		graphics,
+		graphics: container,
 		actionPath: [],
 		lanePath: [],
 		isDead: false
