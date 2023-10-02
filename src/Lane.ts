@@ -11,8 +11,8 @@ import { interchangeTexture, Slot, slotTexture } from "./Slot";
 import { GrayscaleFilter } from "@pixi/filter-grayscale";
 import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
 
-const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe.png');
-const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
+const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
+const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe2.png');
 const pierTexture = new PIXI.Texture(
 	PIXI.Texture.from('assets/pier.png').castToBaseTexture(), new PIXI.Rectangle(
 		208, 96, 74, 96
