@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
-import { CRATE_WIDTH, Crate, createCrate, CrateType } from "./Crate";
-import { Lane } from "./Lane";
-import { Features } from "./Features";
-import { randomInt, weightedSample } from "./random";
+import {Crate, CRATE_WIDTH, CrateType, createCrate} from "./Crate";
+import {Lane} from "./Lane";
+import {Configuration} from "./Configuration";
+import {weightedSample} from "./random";
 
 export enum BoatLocation {
 	Lane,
@@ -28,8 +28,8 @@ export function getBoatWidth(boat: Boat): number {
 	return CRATE_WIDTH
 }
 
-export function createBoat(features: Features, size?: number) {
-	size ??= randomInt(features.minBoatSize, features.maxBoatSize);
+export function createBoat(configuration: Configuration, size?: number) {
+	size ??= weightedSample(configuration.boatSpawningDistribution) ?? 3;
 	const boat: Boat = {
 		size,
 		crates: [],
@@ -53,12 +53,13 @@ export function createBoat(features: Features, size?: number) {
 	)
 
 	while (size-- > 0) {
+		const weight = (c: CrateType) => configuration.enabledCrateTypes.indexOf(c) === -1 ? 0 : 1;
 		const crate = createCrate(weightedSample([
-			[1, CrateType.Circle],
-			[1, CrateType.Square],
-			[1, CrateType.Triangle],
-			[features.enableFourthItem ? 1 : 0, CrateType.Cross],
-			[features.enableJokerCrateBoats ? 0.5 : 0, CrateType.Joker],
+			[weight(CrateType.Circle), CrateType.Circle],
+			[weight(CrateType.Square), CrateType.Square],
+			[weight(CrateType.Triangle), CrateType.Triangle],
+			[weight(CrateType.Cross), CrateType.Cross],
+			[configuration.enableJokerCrateBoats ? 0.5 : 0, CrateType.Joker],
 		]) ?? CrateType.Circle);
 		crate.graphics.x = boat.crates.length * CRATE_WIDTH;
 		crate.graphics.alpha = 0.5;

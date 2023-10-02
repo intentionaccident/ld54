@@ -11,8 +11,6 @@ Ships that take nothing but just block for a few turns
 
 "tetris hold"
 
-"slow" ability, basically reverse of one tick flush
-
 
 My gameplan
 1. Playtest -> Separate into levels with different diff. and abilites
@@ -21,3 +19,8 @@ My gameplan
 4. Integrate hand drawn textures
 ...
 27. Upgrade menu
+
+
+idea:
+- Change magnet: select crate, all items in lane moves closer (compresses) around crate
+- "slow" ability, basically reverse of one tick flush

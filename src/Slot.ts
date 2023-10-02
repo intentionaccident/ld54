@@ -2,7 +2,7 @@ import {Crate} from "./Crate";
 import {AbilityType} from "./AbilityBar";
 import {GameState} from "./GameState";
 import * as PIXI from "pixi.js";
-import {CranePattern, CraneType} from "./Features";
+import {CranePattern, CraneType} from "./Configuration";
 import {tick} from "./tick";
 
 export class Slot {
@@ -27,23 +27,23 @@ export class Slot {
 							if (slot !== this) slot.showDefault();
 							const enableSlotIfEmpty = (slot: Slot) => {
 								if (slot === this) return;
-								if (gameState.features.craneType === CraneType.OnlyEmpty) {
+								if (gameState.configuration.craneType === CraneType.OnlyEmpty) {
 									if (slot.crate === null) slot.showButton(AbilityType.Swap);
-								} else if (gameState.features.craneType === CraneType.Swap) {
+								} else if (gameState.configuration.craneType === CraneType.Swap) {
 
 								} else throw new Error("Unreachable.");
 							}
-							if (this.gameState.features.cranePattern === CranePattern.Anywhere) {
+							if (this.gameState.configuration.cranePattern === CranePattern.Anywhere) {
 								enableSlotIfEmpty(slot);
-							} else if (this.gameState.features.cranePattern === CranePattern.SameLane) {
-								for (let i = 1; i < this.gameState.features.craneRange+1; i++) {
+							} else if (this.gameState.configuration.cranePattern === CranePattern.SameLane) {
+								for (let i = 1; i < this.gameState.configuration.craneRange+1; i++) {
 									if (
 										(row === this.row() && col === this.col() - i)
 										|| (row === this.row() && col === this.col() + i)
 									) enableSlotIfEmpty(slot);
 								}
-							} else if (this.gameState.features.cranePattern === CranePattern.Cross) {
-								for (let i = 1; i < this.gameState.features.craneRange+1; i++) {
+							} else if (this.gameState.configuration.cranePattern === CranePattern.Cross) {
+								for (let i = 1; i < this.gameState.configuration.craneRange+1; i++) {
 									if (
 										(row === this.row() && col === this.col() - i)
 										|| (row === this.row() && col === this.col() + i)

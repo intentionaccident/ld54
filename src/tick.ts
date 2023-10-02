@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 import {CrateType} from "./Crate";
 import {GameState} from "./GameState";
 import {deactivateAbility} from "./AbilityBar";
-import {CompressType, FlushType} from "./Features";
+import {CompressType, FlushType} from "./Configuration";
 import {moveCrate, swapCrate} from "./Slot";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
@@ -68,18 +68,18 @@ export function tick(gameState: GameState, action: Action) {
 		}
 	} else if (action.type === "lock") {
 		if (lanes[action.row].lockTurnsLeft <= 0) {
-			lanes[action.row].lockTurnsLeft += gameState.features.holdForXTurns;
+			lanes[action.row].lockTurnsLeft += gameState.configuration.holdForXTurns;
 		} else {
 			return;
 		}
 	} else if (action.type === "fast-forward") {
-		for (let i = 0; i < gameState.features.fastForwardTicks; i++) {
+		for (let i = 0; i < gameState.configuration.fastForwardTicks; i++) {
 			moveLaneForward(gameState, lanes[action.row]);
 		}
 		lanes[action.row].lockTurnsLeft = 1;
 	} else if (action.type === "compress") {
 		let lane = lanes[action.row];
-		if (gameState.features.compressType === CompressType.Full) {
+		if (gameState.configuration.compressType === CompressType.Full) {
 			for (let i = 0; i < lane.slots.length; i++) {
 				const slot = lane.slots[i];
 				if (slot.crate === null) {
@@ -91,7 +91,7 @@ export function tick(gameState: GameState, action: Action) {
 					}
 				}
 			}
-		} else if (gameState.features.compressType === CompressType.EatGaps) {
+		} else if (gameState.configuration.compressType === CompressType.EatGaps) {
 			let rightSideEmpty = true;
 			let foundGap = false;
 			let gapLeftmostCol = -1;
@@ -126,9 +126,9 @@ export function tick(gameState: GameState, action: Action) {
 	} else if (action.type === "flush") {
 		const lane = gameState.lanes[action.from.row()];
 		let flushTicks = -1;
-		if (gameState.features.flushType === FlushType.Full) {
+		if (gameState.configuration.flushType === FlushType.Full) {
 			flushTicks = lane.slots.length - action.from.col();
-		} else if (gameState.features.flushType === FlushType.OneTick) {
+		} else if (gameState.configuration.flushType === FlushType.OneTick) {
 			flushTicks = 1;
 		} else {
 			throw new Error("Unreachable.");
