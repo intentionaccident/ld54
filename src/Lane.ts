@@ -316,6 +316,10 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		laneButtonText.x = laneButton.width / 2;
 		laneButtonText.y = laneButton.height / 2;
 		laneButton.addChild(laneButtonText);
+		laneButton.hitArea = new PIXI.Rectangle(
+			0, 32,
+			160, 160
+		)
 		const lane: Lane = {
 			graphics: new PIXI.Container(),
 			slots: [],
@@ -406,8 +410,8 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		buttonPipe.visible = true;
 		buttonSmokingPipe.visible = false;
 	});
-	const width = 180;
-	const height = 160;
+	const width = 210;
+	const height = 170;
 	button.hitArea = new PIXI.Rectangle(
 		0, VIEW_HEIGHT - height, width, height
 	);
