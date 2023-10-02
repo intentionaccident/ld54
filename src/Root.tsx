@@ -6,11 +6,11 @@ import { PixiRoot } from "./PixiRoot";
 import { addLaneGraphics, setScore, setLives, setLevel, incrementLevel, setProgress } from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
-import {BoatManager, moveBoatToLane} from "./BoatManager";
+import { BoatManager, moveBoatToLane } from "./BoatManager";
 import { AbilityBar } from "./AbilityBar";
 import { animate } from "./animate";
 import { advanceLevel, createConfiguration } from "./Configuration";
-import {ScoreDisplay} from "./ScoreDisplay";
+import { ScoreDisplay } from "./ScoreDisplay";
 
 export const lighthouseTextures = [PIXI.Texture.from('assets/lighthouse1.png'),
 PIXI.Texture.from('assets/lighthouse2.png'),
@@ -18,7 +18,7 @@ PIXI.Texture.from('assets/lighthouse3.png'),
 PIXI.Texture.from('assets/lighthouse4.png'),
 PIXI.Texture.from('assets/lighthouse5.png'),
 PIXI.Texture.from('assets/lighthouse6.png'),
-	];
+];
 
 export class Lighthouse {
 	private readonly sprites: PIXI.Sprite[] = [];
@@ -48,6 +48,7 @@ export class Lighthouse {
 }
 
 export function Root() {
+	const [text, setText] = React.useState<string | null>("Hello World")
 	const app = new PIXI.Application({
 		width: 1280,
 		height: 640,
@@ -68,6 +69,26 @@ export function Root() {
 	bunny.anchor.x = 0.5;
 	bunny.anchor.y = 0.5;
 	app.stage.addChild(bunny);
+
+
+	const score = new PIXI.Text();
+	score.x = 2 * 520;
+	app.stage.addChild(score);
+
+	const lives = new PIXI.Text();
+	lives.x = 2 * 520;
+	lives.y = 2 * 30;
+	app.stage.addChild(lives);
+
+	const level = new PIXI.Text();
+	level.x = 2 * 520;
+	level.y = 2 * 60;
+	app.stage.addChild(level);
+
+	const progress = new PIXI.Text();
+	progress.x = 2 * 600;
+	progress.y = 2 * 90;
+	app.stage.addChild(progress);
 
 	const gameState: GameState = {
 		app,
@@ -120,8 +141,8 @@ export function Root() {
 
 	return <div>
 		<GameFrame>
-			<UIRoot />
 			<PixiRoot app={app} />
+			{text && <UIRoot text={text} close={() => setText(null)} />}
 		</GameFrame>
 	</div>;
 }
