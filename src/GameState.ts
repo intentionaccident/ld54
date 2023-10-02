@@ -21,4 +21,6 @@ export interface GameState {
 	activeAbility: AbilityType | null;
 	laneAnimations: (() => boolean)[];
 	actionAnimations: (() => boolean)[];
+	nonBlockingAnimations: (() => boolean)[];
+	popupIsActive: boolean;
 }

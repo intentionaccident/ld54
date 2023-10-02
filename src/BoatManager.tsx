@@ -95,11 +95,13 @@ export class BoatManager {
 		return pool;
 	}
 
-	public removeBoat(lane: Lane) {
+	public removeBoat(lane: Lane, shouldDestroy = false) {
 		if (lane.boat === undefined) throw new Error('`lane.boat` is null.');
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
-		lane.boat.manifestGraphics.destroy();
-		lane.boat.boatGraphics.destroy();
+		if (shouldDestroy) {
+			lane.boat.manifestGraphics.destroy();
+			lane.boat.boatGraphics.destroy();
+		}
 		delete lane.boat;
 		this.boats.push(createBoat(this.gameState.configuration));
 	}
