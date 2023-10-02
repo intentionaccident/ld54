@@ -1,10 +1,10 @@
-import {Action, decrementLives, incrementLevel, incrementProgress, incrementScore, Lane, spawnCrateLine} from "./Lane";
+import { Action, decrementLives, incrementLevel, incrementProgress, incrementScore, Lane, spawnCrateLine } from "./Lane";
 import * as PIXI from "pixi.js";
-import {CrateType} from "./Crate";
-import {GameState} from "./GameState";
-import {deactivateAbility} from "./AbilityBar";
-import {CompressType, FlushType} from "./Configuration";
-import {moveCrate, swapCrate} from "./Slot";
+import { CrateType } from "./Crate";
+import { GameState } from "./GameState";
+import { deactivateAbility } from "./AbilityBar";
+import { CompressType, FlushType } from "./Configuration";
+import { moveCrate, swapCrate } from "./Slot";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane = true) {
 	if (lane.lockTurnsLeft > 1) {
@@ -153,7 +153,7 @@ export function tick(gameState: GameState, action: Action) {
 			while (lane.slots[gapLeftmostCol].crate === null) {
 				for (let col = gapLeftmostCol + 1; col < lane.slots.length; col++) {
 					if (lane.slots[col].crate !== null) {
-						moveCrate(gameState, lane.slots[col], lane.slots[col-1], false);
+						moveCrate(gameState, lane.slots[col], lane.slots[col - 1], false);
 					}
 				}
 			}
@@ -190,6 +190,8 @@ export function tick(gameState: GameState, action: Action) {
 	}
 
 	if (gameState.lives.value <= 0) {
+		gameState.onDeath()
+		return;
 		const message = new PIXI.Text("You are become dead!", {
 			fill: 0xFF0000,
 			fontSize: 40

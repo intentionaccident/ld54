@@ -118,7 +118,8 @@ export function Root() {
 		actionAnimations: [],
 		nonBlockingAnimations: [],
 		popupIsActive: false,
-		lighthouse: new Lighthouse(app)
+		lighthouse: new Lighthouse(app),
+		onDeath: () => setText(LetterType.Death)
 	};
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
@@ -154,7 +155,11 @@ export function Root() {
 	return <div>
 		<GameFrame>
 			<PixiRoot app={app} />
-			{text != null && <UIRoot text={messages[text].replace("%", gameState.level.value.toString())} close={() => setText(null)} />}
+			{text != null && <UIRoot
+				text={messages[text].replace("%", gameState.level.value.toString())}
+				close={() => setText(null)}
+				reload={text === LetterType.Death}
+			/>}
 		</GameFrame>
 	</div>;
 }
