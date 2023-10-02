@@ -282,7 +282,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const buttonSize = 50;
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
-	const topMargin = pushButtonHeight + 10 + 36;
+	const topMargin = pushButtonHeight + 10 + 38;
 	let leftMargin = 40 + laneCount * 16;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
@@ -310,7 +310,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 
 		lane.addBoatButton.pivot.set(0, -lane.addBoatButton.height/2);
 		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1) + 14;
-		lane.addBoatButton.y = -120;
+		lane.addBoatButton.y = -100;
 		lane.addBoatButton.visible = false;
 		lane.graphics.addChild(lane.addBoatButton);
 
