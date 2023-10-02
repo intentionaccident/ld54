@@ -151,6 +151,11 @@
   resolved "https://registry.yarnpkg.com/@pixi/filter-fxaa/-/filter-fxaa-7.3.1.tgz#2819522d0ee703af4904a2cc9d89cec835923b81"
   integrity sha512-ZL3kjIkMm29+G8AOuxDDo2VrqeJEBw6zloDDerUq71NRsyIUWJEdscdiVUDytL1/JqZwxdHEvzDNG6IF3P1VFg==
 
+"@pixi/filter-grayscale@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@pixi/filter-grayscale/-/filter-grayscale-5.1.1.tgz#5721a6878caef866fe2abab06e591207e489ede5"
+  integrity sha512-tRyggOhTdAQlQpgH/IzjCbORICua/Gm0JkKGOcdDQOHqt4bTVvAehQ59e2+A6A1yA8pevu2L/C25qQhsPgNW9w==
+
 "@pixi/filter-noise@7.3.1":
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/@pixi/filter-noise/-/filter-noise-7.3.1.tgz#8b3cf59352bd34a8d465afb5c07a14593fd15568"

@@ -68,6 +68,7 @@ export function createBoat(configuration: Configuration, size?: number) {
 	};
 
 	boat.manifestGraphics.interactive = true;
+	boat.manifestGraphics.cursor = 'pointer';
 
 	for (let i = 0; i < size; i++) {
 		const weight = (c: CrateType) => configuration.enabledCrateTypes.indexOf(c) === -1 ? 0 : 1;
