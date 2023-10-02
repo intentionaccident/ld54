@@ -24,7 +24,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 		}
 
 		const lastCrate = lane.slots[col].crate;
-		lane.slots[col].destroyCrate();
+		lane.slots[col].pushCrateIntoWater();
 
 		if (!lane.boat) {
 			decrementLives(gameState);
@@ -42,10 +42,13 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 				continue;
 			} else {
 				incrementScore(gameState, lane.boat.size);
+				let wait = 0.5 * 60;
 				const boat = lane.boat;
 				gameState.boatManager?.removeBoat(lane, false);
 				let speed = 0.5;
 				gameState.nonBlockingAnimations.push(() => {
+					wait--;
+					if (wait > 0) return true;
 					boat.boatGraphics.x += speed;
 					speed += 0.005;
 					speed = Math.min(2, speed);
