@@ -4,12 +4,11 @@ import {boatTexture} from "./Boat";
 
 export function createBox(
 	width: number, height: number,
-	color: PIXI.ColorSource, interactive: boolean = false
+	color: PIXI.ColorSource, interactive: boolean = false, lineWidth = 1, border = 0
 ): PIXI.Graphics {
 	const graphics = new PIXI.Graphics();
 	graphics.beginFill(color);
-	const lineWidth = 1;
-	graphics.lineStyle(lineWidth, 0x000000);
+	graphics.lineStyle(lineWidth, border);
 	graphics.drawRect(lineWidth / 2, lineWidth / 2, width - lineWidth / 2, height - lineWidth / 2);
 	if (interactive) {
 		graphics.interactive = true;
