@@ -27,7 +27,6 @@ idea:
 
 
 Add arrow underneath next crate request on ship
-Add pier background
 Add score
 
 Add deck
