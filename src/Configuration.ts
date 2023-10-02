@@ -60,6 +60,7 @@ export const createConfiguration: () => Configuration = () => ({
 		[1, 0],
 		[1, 1],
 		[0, 2],
+		[0, 3],
 	],
 	boatSpawningDistribution: [
 		[1, 2],
