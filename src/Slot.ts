@@ -20,6 +20,7 @@ export const interchangeTexture = new PIXI.Texture(
 
 export class Slot {
 	private ability: AbilityType | null = null;
+	public button?: PIXI.Sprite;
 
 	constructor(
 		private readonly gameState: GameState,
