@@ -1,19 +1,19 @@
 import * as PIXI from "pixi.js";
-import {createBox} from "./Box";
-import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
-import {Boat, boatTexture} from "./Boat";
-import {GameState} from "./GameState";
-import {weightedSample} from "./random";
-import {advanceLevel, Configuration} from "./Configuration";
-import {AbilityType} from "./AbilityBar";
-import {tick} from "./tick";
-import {interchangeTexture, Slot, slotTexture} from "./Slot";
-import {GrayscaleFilter} from "@pixi/filter-grayscale";
-import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
+import { createBox } from "./Box";
+import { Crate, CrateType, CrateTypes, createCrate } from "./Crate";
+import { Boat, boatTexture } from "./Boat";
+import { GameState } from "./GameState";
+import { weightedSample } from "./random";
+import { advanceLevel, Configuration } from "./Configuration";
+import { AbilityType } from "./AbilityBar";
+import { tick } from "./tick";
+import { interchangeTexture, Slot, slotTexture } from "./Slot";
+import { GrayscaleFilter } from "@pixi/filter-grayscale";
+import { VIEW_HEIGHT, VIEW_WIDTH } from "./view";
 
 const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe.png');
 const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
-const pierTexture =  new PIXI.Texture(
+const pierTexture = new PIXI.Texture(
 	PIXI.Texture.from('assets/pier.png').castToBaseTexture(), new PIXI.Rectangle(
 		208, 96, 74, 96
 	)
@@ -81,6 +81,7 @@ export function incrementLevel(state: GameState) {
 		}
 	}
 	state.boatManager!.reset();
+	state.onLevelChanged()
 }
 
 export function setLevel(state: GameState, value: number) {
@@ -119,7 +120,7 @@ function createRandomCrate(configuration: Configuration, requestPool: Record<Cra
 		let msg = "";
 		let totalWeight = options.reduce((s, o) => s + o[0], 0);
 		for (const [weight, type] of options) {
-			const s = Number(weight/totalWeight).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0});
+			const s = Number(weight / totalWeight).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 0 });
 			msg += `${CrateType[type]}: ${s}`;
 			msg += '\n';
 		}
@@ -157,7 +158,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 
 	let crateCount = weightedSample(gameState.configuration.crateSpawningDistribution) ?? 0;
 	if (
-		gameState.lanes.flatMap(l=>l.slots).reduce((t, s)=> t + (s.crate === null ? 0 : 1), 0) === 0
+		gameState.lanes.flatMap(l => l.slots).reduce((t, s) => t + (s.crate === null ? 0 : 1), 0) === 0
 		&& crateCount === 0
 	) {
 		crateCount = 1;
@@ -176,7 +177,7 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 					crate!.graphics.scale.y += (1 - crate!.graphics.scale.y) / 5;
 					const epsilon = 10e-3;
 					if (Math.abs(1 - crate!.graphics.scale.x) < epsilon) {
-						crate!.graphics.scale.set(1,1)
+						crate!.graphics.scale.set(1, 1)
 						return false;
 					} else return true;
 				});
@@ -198,13 +199,13 @@ export class LaneButton {
 		graphics.on('click', () => {
 			switch (this.ability) {
 				case AbilityType.FastForward:
-					tick(gameState, {type: "fast-forward", row})
+					tick(gameState, { type: "fast-forward", row })
 					break;
 				case AbilityType.Compress:
-					tick(gameState, {type: "compress", row})
+					tick(gameState, { type: "compress", row })
 					break;
 				case AbilityType.Lock:
-					tick(gameState, {type: "lock", row})
+					tick(gameState, { type: "lock", row })
 					break;
 				default:
 					throw new Error("Unreachable.");
@@ -238,7 +239,7 @@ function setButtonAnimations(button: PIXI.DisplayObject, targets: PIXI.Sprite[])
 	button.interactive = true;
 	const highlight = (tint: PIXI.ColorSource) => {
 		let color = new PIXI.Color(tint);
-		for (let i = 0; i < targets.length; i++){
+		for (let i = 0; i < targets.length; i++) {
 			targets[i].tint = color;
 			color = color.setAlpha(color.alpha * 0.5);
 			// if (tint !== 0xffffff) {
@@ -255,7 +256,7 @@ function setButtonAnimations(button: PIXI.DisplayObject, targets: PIXI.Sprite[])
 			0xDDDDDD,
 			0xEEEEEE
 		]
-		for (let i = 0; i < targets.length; i++){
+		for (let i = 0; i < targets.length; i++) {
 			targets[i].tint = colors[i];
 		}
 	});
@@ -308,7 +309,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			button: new LaneButton(gameState, row, laneButton, laneButtonText)
 		};
 
-		lane.addBoatButton.pivot.set(0, -lane.addBoatButton.height/2);
+		lane.addBoatButton.pivot.set(0, -lane.addBoatButton.height / 2);
 		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1) + 14;
 		lane.addBoatButton.y = -100;
 		lane.addBoatButton.visible = false;
@@ -335,14 +336,14 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 				const button = new PIXI.Sprite(pushDownButtonTexture);
 				button.x = leftMargin + laneButtonWidth + col * slotWidth + 16;
 				button.y = -button.height;
-				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
+				actionButtons.push({ graphics: button, action: { type: "push", dir: "down", col } });
 				lane.graphics.addChild(button);
 				slot.button = button;
 			} else if (row === laneCount - 1) {
 				const button = new PIXI.Sprite(pushUpButtonTexture);
 				button.x = leftMargin + laneButtonWidth + col * slotWidth - 8;
 				button.y = slotHeight;
-				actionButtons.push({graphics: button, action: {type: "push", dir: "up", col}});
+				actionButtons.push({ graphics: button, action: { type: "push", dir: "up", col } });
 				lane.graphics.addChild(button);
 				slot.button = button;
 			}
@@ -397,7 +398,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	);
 	button.interactive = true;
 	button.cursor = "pointer";
-	actionButtons.push({graphics: button, action: {type: "none"}});
+	actionButtons.push({ graphics: button, action: { type: "none" } });
 	gameState.app.stage.addChild(button);
 
 	for (let col = 0; col < slotCount / 2; col++) {
