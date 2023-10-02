@@ -67,9 +67,9 @@ export function activateAbility(state:GameState, ability: AbilityType) {
 
 export class AbilityBar {
 	private readonly abilities: [string, AbilityType][] = [
-		// ["⏩", AbilityType.FastForward],
+		["⏩", AbilityType.FastForward],
 		["🧲", AbilityType.Compress],
-		["🏗", AbilityType.Swap],
+		// ["🏗", AbilityType.Swap],
 		["🌊", AbilityType.Flush],
 	];
 	private readonly buttons: PIXI.Graphics[] = [];

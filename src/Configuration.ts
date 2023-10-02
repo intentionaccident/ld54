@@ -66,7 +66,7 @@ export const createConfiguration: () => Configuration = () => ({
 		[1, 2],
 		[0, 3],
 	],
-	unlockedAbilities: [AbilityType.Compress]
+	unlockedAbilities: []
 });
 
 export function advanceLevel(configuration: Configuration, level: number) {
@@ -85,6 +85,8 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[0, 4],
 			[0, 5],
 		];
+		configuration.enableJokerCrateBoats = true;
+		configuration.jokerCrateChance = 1 / 10;
 	} else if (level === 2) {
 		configuration.shipsNeeded = 6;
 		configuration.boatLookAheadCount = 1;
@@ -113,7 +115,9 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[1, 4],
 			[0, 5],
 		];
-		configuration.unlockedAbilities = [AbilityType.Flush, AbilityType.Compress];
+		configuration.unlockedAbilities = [AbilityType.Flush];
+		configuration.enableJokerCrateBoats = true;
+		configuration.jokerCrateChance = 1 / 5;
 	} else if (level === 4) {
 		configuration.shipsNeeded = 6;
 		configuration.crateSpawningDistribution = [
@@ -127,7 +131,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[1, 4],
 			[0, 5],
 		];
-		configuration.enableJokerCrateBoats = true;
+		configuration.jokerCrateChance = 1 / 10;
 	} else if (level === 5) {
 		configuration.shipsNeeded = 6;
 		configuration.boatLookAheadCount = 2;
@@ -143,7 +147,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[0.5, 5],
 		];
 		configuration.unlockedAbilities = [
-			AbilityType.Compress, AbilityType.Swap, AbilityType.Flush
+			AbilityType.Compress, AbilityType.Flush
 		]
 	} else if (level === 6) {
 		configuration.shipsNeeded = 6;
