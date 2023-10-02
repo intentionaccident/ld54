@@ -4,6 +4,7 @@ import * as PIXI from "pixi.js";
 import {Configuration} from "./Configuration";
 import {AbilityBar, AbilityType} from "./AbilityBar";
 import {Slot} from "./Slot";
+import {Lighthouse} from "./Root";
 
 export interface GameState {
 	abilityBar?: AbilityBar;
@@ -23,4 +24,5 @@ export interface GameState {
 	actionAnimations: (() => boolean)[];
 	nonBlockingAnimations: (() => boolean)[];
 	popupIsActive: boolean;
+	lighthouse: Lighthouse;
 }
