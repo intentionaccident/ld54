@@ -71,8 +71,8 @@ export function advanceLevel(configuration: Configuration, level: number) {
 		configuration.boatLookAheadCount = 1;
 		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle];
 		configuration.crateSpawningDistribution = [
-			[2, 0],
-			[2, 1],
+			[3, 0],
+			[3, 1],
 			[1, 2],
 		];
 		configuration.boatSpawningDistribution = [
@@ -95,10 +95,11 @@ export function advanceLevel(configuration: Configuration, level: number) {
 		];
 	} else if (level === 3) {
 		configuration.boatLookAheadCount = 2;
+		configuration.enabledCrateTypes = [CrateType.Circle, CrateType.Square, CrateType.Triangle, CrateType.Cross];
 		configuration.crateSpawningDistribution = [
-			[0, 0],
+			[1, 0],
 			[2, 1],
-			[1, 2],
+			[2, 2],
 		];
 		configuration.boatSpawningDistribution = [
 			[0, 2],

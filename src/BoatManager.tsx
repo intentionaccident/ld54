@@ -100,9 +100,10 @@ export class BoatManager {
 	}
 
 	private upcomingBoats() {
-		const boats = this.boats.filter(b => b.location === BoatLocation.Deck);
-		if (boats.length < this.gameState.configuration.boatLookAheadCount) {
-			throw new Error("Unable to look ahead");
+		let boats = this.boats.filter(b => b.location === BoatLocation.Deck);
+		while (boats.length < this.gameState.configuration.boatLookAheadCount) {
+			this.boats.push(createBoat(this.gameState.configuration));
+			boats = this.boats.filter(b => b.location === BoatLocation.Deck);
 		}
 		return boats.slice(0, this.gameState.configuration.boatLookAheadCount);
 	}
