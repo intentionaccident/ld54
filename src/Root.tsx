@@ -18,6 +18,8 @@ export function Root() {
 		antialias: false,
 		backgroundColor: 0x3AC5B9
 	});
+	const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
+	app.stage.addChild(scratch)
 
 	const texture = PIXI.Texture.from('assets/bunny.png');
 	const bunny = new PIXI.Sprite(texture);
@@ -87,10 +89,6 @@ export function Root() {
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
-
-
-	// const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/scratch.gif'));
-	// app.stage.addChild(scratch)
 
 	return <div>
 		<GameFrame>

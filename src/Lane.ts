@@ -222,12 +222,33 @@ export class LaneButton {
 	}
 }
 
-function setButtonAnimations(button: PIXI.Sprite) {
+function setButtonAnimations(button: PIXI.Sprite, targets: PIXI.Sprite[]) {
 	button.interactive = true;
-	button.on('mousedown', () => button.tint = 0xADB2A9);
-	button.on('mousemove', () => button.tint = 0xD0D6CB);
-	button.on('mouseup', () => button.tint = 0xD0D6CB);
-	button.on('mouseleave', () => button.tint = 0xffffff);
+	const highlight = (tint: PIXI.ColorSource) => {
+		let color = new PIXI.Color(tint);
+		for (let i = 0; i < targets.length; i++){
+			targets[i].tint = color;
+			color = color.setAlpha(color.alpha * 0.5);
+			// if (tint !== 0xffffff) {
+			// 	color = color.multiply(0xaaaaaa);
+			// }
+		}
+	};
+	button.on('mousedown', () => highlight(0xADB2A9));
+	button.on('mousemove', () => {
+		// highlight(0xD0D6CB)
+		let colors = [
+			0xCCCCCC,
+			0xCCCCCC,
+			0xDDDDDD,
+			0xEEEEEE
+		]
+		for (let i = 0; i < targets.length; i++){
+			targets[i].tint = colors[i];
+		}
+	});
+	button.on('mouseup', () => highlight(0xD0D6CB));
+	button.on('mouseleave', () => highlight(0xffffff));
 	button.cursor = 'pointer';
 }
 
@@ -240,14 +261,14 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const buttonSize = 50;
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
-	const topMargin = pushButtonHeight + 10 + 20;
+	const topMargin = pushButtonHeight + 10 + 36;
 	let leftMargin = 40 + laneCount * 16;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		// const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
 		const laneButton = new PIXI.Sprite(laneButtonTexture);
-		setButtonAnimations(laneButton);
+		setButtonAnimations(laneButton, [laneButton]);
 		laneButton.x = leftMargin - 94;
 		laneButton.y = -64;
 		const laneButtonText = new PIXI.Text("", {
@@ -278,7 +299,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			lane.graphics.addChild(slotGraphics);
 			if (row !== 0) {
 				const interchangeGraphics = new PIXI.Sprite(interchangeTexture);
-				interchangeGraphics.x = 30;
+				interchangeGraphics.x = 28;
 				interchangeGraphics.y = -56;
 				slotGraphics.addChild(interchangeGraphics);
 			}
@@ -290,24 +311,44 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 
 			if (row === 0) {
 				const button = new PIXI.Sprite(pushDownButtonTexture);
-				setButtonAnimations(button);
 				button.x = leftMargin + laneButtonWidth + col * slotWidth + 16;
 				button.y = -button.height;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
 				lane.graphics.addChild(button);
+				slot.button = button;
 			} else if (row === laneCount - 1) {
 				const button = new PIXI.Sprite(pushUpButtonTexture);
-				setButtonAnimations(button);
 				button.x = leftMargin + laneButtonWidth + col * slotWidth - 8;
 				button.y = slotHeight;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "up", col}});
 				lane.graphics.addChild(button);
+				slot.button = button;
 			}
 		}
 		lane.graphics.addChild(laneButton);
 		lanes.push(lane);
 		gameState.app.stage.addChild(lane.graphics);
 		leftMargin -= 16;
+	}
+
+	const slotsAtCol = (lanes: Lane[], col: number) => {
+		let slots: PIXI.Sprite[] = [];
+		for (let row = 0; row < laneCount; row++) {
+			slots.push(lanes[row].slots[col].graphics);
+		}
+		return slots;
+	};
+	for (let row = 0; row < laneCount; row++) {
+		for (let col = 0; col < slotCount; col++) {
+			const button = lanes[row].slots[col].button;
+			if (button) {
+				setButtonAnimations(button, [button].concat(
+					row === 0
+						? slotsAtCol(lanes, col)
+						: slotsAtCol(lanes, col).reverse()
+				));
+			}
+		}
 	}
 
 	const button = createBox(laneButtonWidth, slotHeight, 16777215, true);
