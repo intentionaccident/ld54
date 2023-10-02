@@ -4,8 +4,9 @@ import styles from "./UIRoot.sass"
 export const UIRoot: React.FC<{
 	text: string
 	close: () => void
-	reload: boolean
-}> = ({ text, close, reload }) => {
+	reload: boolean,
+	post?: string | boolean
+}> = ({ text, close, reload, post }) => {
 	return <div className={styles.uiRoot} onClick={() => reload ? window.location = window.location : close()}>
 		<div className={styles.letter} onClick={(e) => e.stopPropagation()}>
 			<div>
@@ -19,6 +20,7 @@ export const UIRoot: React.FC<{
 				<br />
 				Port Authority
 			</div>
+			<div>PS: {post}</div>
 		</div>
 	</div>
 }
