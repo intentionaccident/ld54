@@ -57,13 +57,12 @@ export function incrementScore(state: GameState, value: number) {
 
 export function setScore(state: GameState, value: number) {
 	state.score.value = value;
-	state.score.graphics.text = `Score: ${value}`;
+	state.scoreDisplay?.update(value);
 }
 
 export function setLives(state: GameState, value: number) {
 	if (value < 0) value = 0;
 	state.lives.value = value;
-	state.lives.graphics.text = `Lives: ${value}`;
 	state.lighthouse.setLives(state.lives.value);
 }
 
@@ -86,7 +85,6 @@ export function incrementLevel(state: GameState) {
 
 export function setLevel(state: GameState, value: number) {
 	state.level.value = value;
-	state.level.graphics.text = `Level: ${value+1}`;
 }
 
 export function incrementProgress(state: GameState, value: number) {
@@ -95,11 +93,6 @@ export function incrementProgress(state: GameState, value: number) {
 
 export function setProgress(state: GameState, value: number) {
 	state.progress.value = value;
-	const s = Number(state.progress.value / state.configuration.shipsNeeded).toLocaleString(undefined, {
-		style: 'percent',
-		minimumFractionDigits: 0
-	});
-	state.progress.graphics.text = `${s}`;
 	state.boatManager?.updateDeckGraphics();
 }
 function createRandomCrate(configuration: Configuration, requestPool: Record<CrateType, number>): Crate | null {
@@ -163,6 +156,12 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 	}
 
 	let crateCount = weightedSample(gameState.configuration.crateSpawningDistribution) ?? 0;
+	if (
+		gameState.lanes.flatMap(l=>l.slots).reduce((t, s)=> t + (s.crate === null ? 0 : 1), 0) === 0
+		&& crateCount === 0
+	) {
+		crateCount = 1;
+	}
 	for (let i = 0; i < crateCount; i++) {
 		if (slots.length === 0) break;
 		const slot = slots[Math.floor(Math.random() * slots.length)];

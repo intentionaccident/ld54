@@ -5,17 +5,19 @@ import {Configuration} from "./Configuration";
 import {AbilityBar, AbilityType} from "./AbilityBar";
 import {Slot} from "./Slot";
 import {Lighthouse} from "./Root";
+import {ScoreDisplay} from "./ScoreDisplay";
 
 export interface GameState {
+	scoreDisplay?: ScoreDisplay;
 	abilityBar?: AbilityBar;
 	app: PIXI.Application;
 	actionButtons: ActionButton[];
 	lanes: Lane[];
 	turn: number;
-	score: { value: number, graphics: PIXI.Text };
-	lives: { value: number, graphics: PIXI.Text };
-	level: { value: number, graphics: PIXI.Text };
-	progress: { value: number, graphics: PIXI.Text };
+	score: { value: number };
+	lives: { value: number };
+	level: { value: number };
+	progress: { value: number };
 	boatManager?: BoatManager;
 	configuration: Configuration;
 	selectedSlot: Slot | null;
