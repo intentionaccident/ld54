@@ -41,7 +41,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 			if (lane.boat.lastFilled > 0) {
 				continue;
 			} else {
-				incrementScore(gameState, 1);
+				incrementScore(gameState, lane.boat.size);
 			}
 		} else {
 			decrementLives(gameState);
