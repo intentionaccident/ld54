@@ -208,20 +208,20 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const laneCount = 3;
 	const slotCount = 11;
 	const laneSpacing = 0;
-	const slotWidth = 32;
-	const slotHeight = 48;
-	const buttonSize = 25;
+	const slotWidth = 64;
+	const slotHeight = 96;
+	const buttonSize = 50;
 	const laneButtonWidth = buttonSize;
 	const pushButtonHeight = buttonSize;
 	const topMargin = pushButtonHeight + 10;
-	const leftMargin = 10;
+	let leftMargin = 10 + laneCount * 16;
 	const lanes: Lane[] = [];
 	const actionButtons: ActionButton[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
 		laneButton.x = leftMargin;
 		const laneButtonText = new PIXI.Text("", {
-			fontSize: 10,
+			fontSize: 20,
 			align: 'center'
 		});
 		laneButtonText.anchor.set(0.5, 0.5);
@@ -236,7 +236,8 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			button: new LaneButton(gameState, row, laneButton, laneButtonText)
 		};
 
-		lane.addBoatButton.x = slotWidth * (slotCount + 1);
+		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1);
+		lane.addBoatButton.y = 20;
 		lane.addBoatButton.visible = false;
 		lane.graphics.addChild(lane.addBoatButton);
 
@@ -253,7 +254,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 
 			if (row === 0) {
 				const button = createBox(slotWidth, pushButtonHeight, 16777215, true);
-				button.x = leftMargin + laneButtonWidth + col * slotWidth;
+				button.x = leftMargin + laneButtonWidth + col * slotWidth + 16;
 				button.y = -button.height;
 				actionButtons.push({graphics: button, action: {type: "push", dir: "down", col}});
 				lane.graphics.addChild(button);
@@ -268,11 +269,12 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		lane.graphics.addChild(laneButton);
 		lanes.push(lane);
 		gameState.app.stage.addChild(lane.graphics);
+		leftMargin -= 16;
 	}
 
 	const button = createBox(laneButtonWidth, slotHeight, 16777215, true);
 	button.x = leftMargin;
-	button.y = 230;
+	button.y = 2*230;
 	actionButtons.push({graphics: button, action: {type: "none"}});
 	gameState.app.stage.addChild(button);
 

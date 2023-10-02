@@ -1,2 +1,2 @@
-export const VIEW_WIDTH = 640;
-export const VIEW_HEIGHT = 320;
+export const VIEW_WIDTH = 1280;
+export const VIEW_HEIGHT = 640;

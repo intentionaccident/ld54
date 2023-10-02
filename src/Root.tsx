@@ -18,8 +18,6 @@ export function Root() {
 		antialias: false,
 		backgroundColor: 0x3AC5B9
 	});
-	app.stage.scale.set(2);
-
 
 	const texture = PIXI.Texture.from('assets/bunny.png');
 	const bunny = new PIXI.Sprite(texture);
@@ -32,22 +30,22 @@ export function Root() {
 
 
 	const score = new PIXI.Text();
-	score.x = 520;
+	score.x = 2*520;
 	app.stage.addChild(score);
 
 	const lives = new PIXI.Text();
-	lives.x = 520;
-	lives.y = 30;
+	lives.x = 2*520;
+	lives.y = 2*30;
 	app.stage.addChild(lives);
 
 	const level = new PIXI.Text();
-	level.x = 520;
-	level.y = 60;
+	level.x = 2*520;
+	level.y = 2*60;
 	app.stage.addChild(level);
 
 	const progress = new PIXI.Text();
-	progress.x = 600;
-	progress.y = 90;
+	progress.x = 2*600;
+	progress.y = 2*90;
 	app.stage.addChild(progress);
 
 	const gameState: GameState = {
@@ -91,8 +89,8 @@ export function Root() {
 	}
 
 
-	const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/scratch.gif'));
-	app.stage.addChild(scratch)
+	// const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/scratch.gif'));
+	// app.stage.addChild(scratch)
 
 	return <div>
 		<GameFrame>

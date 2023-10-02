@@ -76,14 +76,14 @@ export class AbilityBar {
 	private readonly buttons: PIXI.Graphics[] = [];
 	constructor(private readonly state: GameState) {
 		for (let i = 0; i < 5; i++) {
-			const button = createBox(50, 50, 0xFFFFFF, true);
+			const button = createBox(100, 100, 0xFFFFFF, true);
 			button.y = VIEW_HEIGHT - button.height;
-			button.x = 100 + (button.width) * i;
+			button.x = 200 + (button.width) * i;
 			state.app.stage.addChild(button);
 			this.buttons.push(button);
 		}
 		const addText = (i: number, val: string) => {
-			const text = new PIXI.Text(val);
+			const text = new PIXI.Text(val, {fontSize: 52});
 			text.anchor.set(0.5, 0.5);
 			text.x = this.buttons[i].width / 2;
 			text.y = this.buttons[i].height / 2;
