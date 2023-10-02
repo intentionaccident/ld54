@@ -66,31 +66,41 @@ export function activateAbility(state:GameState, ability: AbilityType) {
 }
 
 export class AbilityBar {
-	public static create(state: GameState) {
-		const buttons: PIXI.Graphics[] = [];
+	private readonly abilities: [string, AbilityType][] = [
+		["⏩", AbilityType.FastForward],
+		["🧲", AbilityType.Compress],
+		["🏗", AbilityType.Swap],
+		["🌊", AbilityType.Flush],
+		["🕸", AbilityType.Hold],
+	];
+	private readonly buttons: PIXI.Graphics[] = [];
+	constructor(private readonly state: GameState) {
 		for (let i = 0; i < 5; i++) {
 			const button = createBox(50, 50, 0xFFFFFF, true);
 			button.y = VIEW_HEIGHT - button.height;
 			button.x = 100 + (button.width) * i;
 			state.app.stage.addChild(button);
-			buttons.push(button);
+			this.buttons.push(button);
 		}
 		const addText = (i: number, val: string) => {
 			const text = new PIXI.Text(val);
 			text.anchor.set(0.5, 0.5);
-			text.x = buttons[i].width / 2;
-			text.y = buttons[i].height / 2;
-			buttons[i].addChild(text);
+			text.x = this.buttons[i].width / 2;
+			text.y = this.buttons[i].height / 2;
+			this.buttons[i].addChild(text);
 		};
-		addText(0, "⏩");
-		buttons[0].on('click', () => activateAbility(state, AbilityType.FastForward));
-		addText(1, "🧲");
-		buttons[1].on('click', () => activateAbility(state, AbilityType.Compress));
-		addText(2, "🏗");
-		buttons[2].on('click', () => activateAbility(state, AbilityType.Swap));
-		addText(3, "🌊");
-		buttons[3].on('click', () => activateAbility(state, AbilityType.Flush));
-		addText(4, "🕸")
-		buttons[4].on('click', () => activateAbility(state, AbilityType.Hold));
+		for (let i = 0; i < this.abilities.length; i++) {
+			const[text, ability] = this.abilities[i];
+			addText(i, text);
+			this.buttons[i].on('click', () => activateAbility(state, ability));
+			this.buttons[i].visible = state.configuration.unlockedAbilities.indexOf(ability) !== -1;
+		}
+	}
+
+	onConfigurationChanged() {
+		for (let i = 0; i < this.abilities.length; i++) {
+			const[text, ability] = this.abilities[i];
+			this.buttons[i].visible = this.state.configuration.unlockedAbilities.indexOf(ability) !== -1;
+		}
 	}
 }

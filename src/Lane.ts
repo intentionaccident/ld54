@@ -4,7 +4,7 @@ import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
 import {Boat} from "./Boat";
 import {GameState} from "./GameState";
 import {weightedSample} from "./random";
-import {Features} from "./Features";
+import {advanceLevel, Configuration} from "./Configuration";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
 import {Slot} from "./Slot";
@@ -41,22 +41,52 @@ export function decrementLives(state: GameState, value: number = 1) {
 	setLives(state, state.lives.value - value);
 }
 
-function createRandomCrate(features: Features, requestPool: Record<CrateType, number>): Crate | null {
-	if (features.enableJokerCrates && Math.random() < features.jokerCrateChance) {
+export function incrementLevel(state: GameState, value: number = 1) {
+	setLevel(state, state.level.value + value);
+	advanceLevel(state.configuration, state.level.value);
+	state.abilityBar!.onConfigurationChanged();
+}
+
+export function setLevel(state: GameState, value: number) {
+	state.level.value = value;
+	state.level.graphics.text = `Level: ${value+1}`;
+}
+
+function createRandomCrate(configuration: Configuration, requestPool: Record<CrateType, number>): Crate | null {
+	if (configuration.enableJokerCrates && Math.random() < configuration.jokerCrateChance) {
 		return createCrate(CrateType.Joker)
 	}
 
-	return createCrate(
-		weightedSample(
-			Object.entries(requestPool)
-				.map(([type, weight]) => [weight, parseInt(type) as CrateType])
-		) ?? weightedSample([
-			[1, CrateType.Circle],
-			[1, CrateType.Square],
-			[1, CrateType.Triangle],
-			[features.enableFourthItem ? 1 : 0, CrateType.Cross],
-		]) ?? CrateType.Circle
-	);
+	// return createCrate(
+	// 	weightedSample(
+	// 		Object.entries(requestPool)
+	// 			.map(([type, weight]) => [weight, parseInt(type) as CrateType])
+	// 	) ?? weightedSample([
+	// 		[1, CrateType.Circle],
+	// 		[1, CrateType.Square],
+	// 		[1, CrateType.Triangle],
+	// 		[configuration.enableFourthItem ? 1 : 0, CrateType.Cross],
+	// 	]) ?? CrateType.Circle
+	// );
+
+	let options: [number, CrateType][] = Object.entries(requestPool)
+		.map(([type, weight]) => [weight, parseInt(type) as CrateType]);
+	const crate = weightedSample(options);
+	if (crate !== null) {
+		let msg = "";
+		let totalWeight = options.reduce((s, o) => s + o[0], 0);
+		for (const [weight, type] of options) {
+			const s = Number(weight/totalWeight).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:0});
+			msg += `${CrateType[type]}: ${s}`;
+			msg += '\n';
+		}
+		console.log(msg);
+		return createCrate(crate);
+	} else {
+		console.warn("Failed to get a sample");
+		console.warn(options);
+		return null;
+	}
 }
 
 export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
@@ -82,15 +112,13 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 		cratePool[key] = Math.max(0, cratePool[key] - (slotCrates[key] ?? 0))
 	}
 
-	const minCrates = 0;
-	const maxCrates = 2;
-	let crateCount = (minCrates + Math.floor(Math.random() * (maxCrates - minCrates + 1)));
+	let crateCount = weightedSample(gameState.configuration.crateSpawningDistribution) ?? 0;
 	for (let i = 0; i < crateCount; i++) {
 		if (slots.length === 0) break;
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
-			slot.addCrate(createRandomCrate(gameState.features, cratePool));
+			slot.addCrate(createRandomCrate(gameState.configuration, cratePool));
 		}
 	}
 }

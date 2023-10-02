@@ -3,12 +3,12 @@ import * as PIXI from "pixi.js";
 import { GameFrame } from "./GameFrame";
 import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
-import { addLaneGraphics, setScore, setLives } from "./Lane";
+import {addLaneGraphics, setScore, setLives, setLevel, incrementLevel} from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
 import { AbilityBar } from "./AbilityBar";
-import { createFeatures } from "./Features";
+import {advanceLevel, createConfiguration} from "./Configuration";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -34,13 +34,19 @@ export function Root() {
 
 
 	const score = new PIXI.Text();
-	score.x = 520
+	score.x = 520;
 	app.stage.addChild(score);
 
 	const lives = new PIXI.Text();
-	lives.x = 520
-	lives.y = 30
-	app.stage.addChild(lives)
+	lives.x = 520;
+	lives.y = 30;
+	app.stage.addChild(lives);
+
+	const level = new PIXI.Text();
+	level.x = 520;
+	level.y = 60;
+	app.stage.addChild(level);
+	level.interactive = true;
 
 	const gameState: GameState = {
 		app,
@@ -49,7 +55,8 @@ export function Root() {
 		actionButtons: [],
 		score: { value: 0, graphics: score },
 		lives: { value: 0, graphics: lives },
-		features: createFeatures(),
+		level: { value: 0, graphics: level },
+		configuration: createConfiguration(),
 		selectedSlot: null,
 		activeAbility: null
 	};
@@ -61,10 +68,13 @@ export function Root() {
 	const [lanes, actionButtons] = addLaneGraphics(gameState);
 	gameState.actionButtons = actionButtons
 	gameState.lanes = lanes
-	AbilityBar.create(gameState);
+	gameState.abilityBar = new AbilityBar(gameState);
+	level.on('click', () => incrementLevel(gameState)); // For debugging
 
 	setScore(gameState, 0);
-	setLives(gameState, 3)
+	setLives(gameState, 3);
+	setLevel(gameState, 0);
+	while (gameState.level.value < 0) incrementLevel(gameState); // For debugging
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}

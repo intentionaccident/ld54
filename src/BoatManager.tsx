@@ -1,5 +1,5 @@
 import {Boat, BoatLocation, createBoat, getBoatLength, getBoatWidth} from "./Boat";
-import {CrateType, CrateTypes} from "./Crate";
+import {CrateType} from "./Crate";
 import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
 import {GameState} from "./GameState";
 import {Lane} from "./Lane";
@@ -10,7 +10,7 @@ export class BoatManager {
 
 	constructor(private readonly gameState: GameState) {
 		for (let i = 0; i < BoatManager.BOAT_BUFFER; i++) {
-			const boat = createBoat(this.gameState.features);
+			const boat = createBoat(this.gameState.configuration);
 			this.boats.push(boat);
 		}
 	}
@@ -75,7 +75,8 @@ export class BoatManager {
 	}
 
 	public getUpcomingCratePool(): Record<CrateType, number> {
-		const countCrates = (type: CrateType) => this.boats.flatMap(b => b.crates).reduce((s, c) => s + (c.type === type ? 1 : 0), 0);
+		let boats = this.visibleBoats().concat(this.upcomingBoats());
+		const countCrates = (type: CrateType) => boats.flatMap(b => b.crates).reduce((s, c) => s + (c.type === type ? 1 : 0), 0);
 		const pool: Record<CrateType, number> = {
 			[CrateType.Circle]: countCrates(CrateType.Circle),
 			[CrateType.Triangle]: countCrates(CrateType.Triangle),
@@ -83,7 +84,6 @@ export class BoatManager {
 			[CrateType.Cross]: countCrates(CrateType.Cross),
 			[CrateType.Joker]: 0,
 		};
-		if (!this.gameState.features.enableFourthItem) pool[CrateType.Cross] = 0;
 		return pool;
 	}
 
@@ -92,7 +92,19 @@ export class BoatManager {
 		this.boats.splice(this.boats.indexOf(lane.boat), 1);
 		lane.boat.graphics.destroy();
 		delete lane.boat;
-		this.boats.push(createBoat(this.gameState.features));
+		this.boats.push(createBoat(this.gameState.configuration));
+	}
+
+	private visibleBoats() {
+		return this.boats.filter(b => b.location === BoatLocation.Lane || b.location === BoatLocation.Hand);
+	}
+
+	private upcomingBoats() {
+		const boats = this.boats.filter(b => b.location === BoatLocation.Deck);
+		if (boats.length < this.gameState.configuration.boatLookAheadCount) {
+			throw new Error("Unable to look ahead");
+		}
+		return boats.slice(0, this.gameState.configuration.boatLookAheadCount);
 	}
 }
 
