@@ -61,103 +61,109 @@ const messages: Record<LetterType, string> = {
 
 export function Root() {
 	const [text, setText] = React.useState<LetterType | null>(LetterType.Intro)
-	const app = new PIXI.Application({
-		width: 1280,
-		height: 640,
-		antialias: false,
-		backgroundColor: 0x3AC5B9
-	});
-	const water = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
-	app.stage.addChild(water)
+	const [gameState, setGameState] = React.useState<GameState | null>(null);
+	React.useEffect(() => {
+		const app = new PIXI.Application({
+			width: 1280,
+			height: 640,
+			antialias: false,
+			backgroundColor: 0x3AC5B9
+		});
+		const water = new PIXI.Sprite(PIXI.Texture.from('assets/background.gif'));
+		app.stage.addChild(water)
 
-	const anchor = new PIXI.Sprite(PIXI.Texture.from('assets/anchor.png'));
-	app.stage.addChild(anchor)
+		const anchor = new PIXI.Sprite(PIXI.Texture.from('assets/anchor.png'));
+		app.stage.addChild(anchor)
 
-	const texture = PIXI.Texture.from('assets/bunny.png');
-	const bunny = new PIXI.Sprite(texture);
-	bunny.x = app.renderer.width / app.stage.scale.x / 2;
-	bunny.y = app.renderer.height / app.stage.scale.y / 2;
+		const texture = PIXI.Texture.from('assets/bunny.png');
+		const bunny = new PIXI.Sprite(texture);
+		bunny.x = app.renderer.width / app.stage.scale.x / 2;
+		bunny.y = app.renderer.height / app.stage.scale.y / 2;
 
-	bunny.anchor.x = 0.5;
-	bunny.anchor.y = 0.5;
-	app.stage.addChild(bunny);
+		bunny.anchor.x = 0.5;
+		bunny.anchor.y = 0.5;
+		app.stage.addChild(bunny);
 
 
-	const score = new PIXI.Text();
-	score.x = 2 * 520;
-	app.stage.addChild(score);
+		const score = new PIXI.Text();
+		score.x = 2 * 520;
+		app.stage.addChild(score);
 
-	const lives = new PIXI.Text();
-	lives.x = 2 * 520;
-	lives.y = 2 * 30;
-	app.stage.addChild(lives);
+		const lives = new PIXI.Text();
+		lives.x = 2 * 520;
+		lives.y = 2 * 30;
+		app.stage.addChild(lives);
 
-	const level = new PIXI.Text();
-	level.x = 2 * 520;
-	level.y = 2 * 60;
-	app.stage.addChild(level);
+		const level = new PIXI.Text();
+		level.x = 2 * 520;
+		level.y = 2 * 60;
+		app.stage.addChild(level);
 
-	const progress = new PIXI.Text();
-	progress.x = 2 * 600;
-	progress.y = 2 * 90;
-	app.stage.addChild(progress);
+		const progress = new PIXI.Text();
+		progress.x = 2 * 600;
+		progress.y = 2 * 90;
+		app.stage.addChild(progress);
 
-	const gameState: GameState = {
-		app,
-		turn: 0,
-		lanes: [],
-		actionButtons: [],
-		score: { value: 0 },
-		lives: { value: 0 },
-		level: { value: 0 },
-		progress: { value: 0 },
-		configuration: createConfiguration(),
-		selectedSlot: null,
-		activeAbility: null,
-		laneAnimations: [],
-		actionAnimations: [],
-		nonBlockingAnimations: [],
-		popupIsActive: false,
-		lighthouse: new Lighthouse(app),
-		onDeath: () => setText(LetterType.Death),
-		onLevelChanged: () => setText(LetterType.LevelAdvance)
-	};
-	app.ticker.add(() => {
-		bunny.rotation += 0.01;
-		animate(gameState, app.ticker);
-	});
+		const gameState: GameState = {
+			app,
+			turn: 0,
+			lanes: [],
+			actionButtons: [],
+			score: {value: 0},
+			lives: {value: 0},
+			level: {value: 0},
+			progress: {value: 0},
+			configuration: createConfiguration(),
+			selectedSlot: null,
+			activeAbility: null,
+			laneAnimations: [],
+			actionAnimations: [],
+			nonBlockingAnimations: [],
+			popupIsActive: false,
+			lighthouse: new Lighthouse(app),
+			onDeath: () => setText(LetterType.Death),
+			onLevelChanged: () => setText(LetterType.LevelAdvance)
+		};
+		app.ticker.add(() => {
+			bunny.rotation += 0.01;
+			animate(gameState, app.ticker);
+		});
 
-	gameState.boatManager = new BoatManager(gameState)
-	gameState.boatManager.drawBoatFromDeck()
-	gameState.boatManager.drawBoatFromDeck()
+		gameState.boatManager = new BoatManager(gameState)
+		gameState.boatManager.drawBoatFromDeck()
+		gameState.boatManager.drawBoatFromDeck()
 
-	const [lanes, actionButtons] = addLaneGraphics(gameState);
-	gameState.actionButtons = actionButtons
-	gameState.lanes = lanes
-	gameState.abilityBar = new AbilityBar(gameState);
+		const [lanes, actionButtons] = addLaneGraphics(gameState);
+		gameState.actionButtons = actionButtons
+		gameState.lanes = lanes
+		gameState.abilityBar = new AbilityBar(gameState);
 
-	const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
-	app.stage.addChildAt(office, 12);
+		const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
+		app.stage.addChildAt(office, 12);
 
-	gameState.boatManager.setHandContainerZIndex(12);
-	gameState.lighthouse.setZIndex(10);
+		gameState.boatManager.setHandContainerZIndex(12);
+		gameState.lighthouse.setZIndex(10);
 
-	gameState.scoreDisplay = new ScoreDisplay(gameState.app);
+		gameState.scoreDisplay = new ScoreDisplay(gameState.app);
 
-	setScore(gameState, 0);
-	setLives(gameState, 5);
-	setLevel(gameState, 0);
-	setProgress(gameState, 0);
-	while (gameState.level.value < 0) incrementLevel(gameState); // For debugging
-	for (const button of actionButtons) {
-		button.graphics.on('click', () => tick(gameState, button.action));
-	}
+		setScore(gameState, 0);
+		setLives(gameState, 5);
+		setLevel(gameState, 0);
+		setProgress(gameState, 0);
+		while (gameState.level.value < 0) incrementLevel(gameState); // For debugging
+		for (const button of actionButtons) {
+			button.graphics.on('click', () => tick(gameState, button.action));
+		}
+		setGameState(gameState);
+	}, []);
 
+	if (gameState === null) return null;
+	
 	return <div>
 		<GameFrame>
-			<PixiRoot app={app} />
+			<PixiRoot app={gameState!.app} />
 			{text != null && <UIRoot
-				text={messages[text].replace("%", (gameState.level.value + 2).toString())}
+				text={messages[text].replace("%", (gameState!.level.value + 2).toString())}
 				close={() => setText(null)}
 				reload={text === LetterType.Death}
 			/>}
