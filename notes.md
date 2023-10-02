@@ -26,9 +26,16 @@ idea:
 - "slow" ability, basically reverse of one tick flush
 
 
-Add graphics
-Add popups
 Add arrow underneath next crate request on ship
+Add pier background
+Add score
+
+Add deck
+Add level popup
+Add ability icons
+Add sound effects
+
+Rebalance levels a lil bit (introduce abilites)
 
 Weigh request crate on ship by position
 upcoming pool count should be weighted items

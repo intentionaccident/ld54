@@ -11,6 +11,41 @@ import { AbilityBar } from "./AbilityBar";
 import { animate } from "./animate";
 import { advanceLevel, createConfiguration } from "./Configuration";
 
+export const lighthouseTextures = [PIXI.Texture.from('assets/lighthouse1.png'),
+PIXI.Texture.from('assets/lighthouse2.png'),
+PIXI.Texture.from('assets/lighthouse3.png'),
+PIXI.Texture.from('assets/lighthouse4.png'),
+PIXI.Texture.from('assets/lighthouse5.png'),
+PIXI.Texture.from('assets/lighthouse6.png'),
+	];
+
+export class Lighthouse {
+	private readonly sprites: PIXI.Sprite[] = [];
+	private readonly container: PIXI.Container;
+	constructor(private readonly app: PIXI.Application) {
+		this.container = new PIXI.Container();
+		app.stage.addChild(this.container);
+		this.container.x = 40;
+		this.container.y = 20;
+		for (let i = 0; i < 6; i++) {
+			let sprite = new PIXI.Sprite(lighthouseTextures[i]);
+			this.sprites.push(sprite);
+			this.container.addChild(sprite);
+		}
+	}
+
+	public setLives(lives: number) {
+		for (let i = 0; i < 6; i++) {
+			this.sprites[i].visible = false;
+		}
+		this.sprites[5 - lives].visible = true;
+	}
+
+	public setZIndex(z: number) {
+		this.app.stage.setChildIndex(this.container, z)
+	}
+}
+
 export function Root() {
 	const app = new PIXI.Application({
 		width: 1280,
@@ -65,7 +100,8 @@ export function Root() {
 		laneAnimations: [],
 		actionAnimations: [],
 		nonBlockingAnimations: [],
-		popupIsActive: false
+		popupIsActive: false,
+		lighthouse: new Lighthouse(app)
 	};
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
@@ -84,12 +120,13 @@ export function Root() {
 	level.on('click', () => incrementLevel(gameState)); // For debugging
 
 	const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
-	app.stage.addChildAt(office, 10);
+	app.stage.addChildAt(office, 11);
 
 	gameState.boatManager.setHandContainerZIndex(11);
+	gameState.lighthouse.setZIndex(9);
 
 	setScore(gameState, 0);
-	setLives(gameState, 3);
+	setLives(gameState, 5);
 	setLevel(gameState, 0);
 	setProgress(gameState, 0);
 	while (gameState.level.value < 0) incrementLevel(gameState); // For debugging

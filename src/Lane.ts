@@ -58,6 +58,7 @@ export function setScore(state: GameState, value: number) {
 export function setLives(state: GameState, value: number) {
 	state.lives.value = value;
 	state.lives.graphics.text = `Lives: ${value}`;
+	state.lighthouse.setLives(state.lives.value);
 }
 
 export function decrementLives(state: GameState, value: number = 1) {
