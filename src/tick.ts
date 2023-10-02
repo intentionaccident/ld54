@@ -4,7 +4,7 @@ import {CrateType} from "./Crate";
 import {GameState} from "./GameState";
 import {deactivateAbility} from "./AbilityBar";
 import {CompressType, FlushType} from "./Features";
-import {destroyCrate, moveCrate, swapCrate} from "./Slot";
+import {moveCrate, swapCrate} from "./Slot";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 	if (lane.lockTurnsLeft > 1) {
@@ -24,7 +24,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0) {
 		}
 
 		const lastCrate = lane.slots[col].crate;
-		destroyCrate(lane.slots[col]);
+		lane.slots[col].destroyCrate();
 
 		if (!lane.boat) {
 			decrementLives(gameState);
