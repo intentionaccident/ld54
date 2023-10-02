@@ -42,7 +42,7 @@ export interface Configuration {
 }
 
 export const createConfiguration: () => Configuration = () => ({
-	shipsNeeded: 8,
+	shipsNeeded: 4,
 	boatLookAheadCount: 0, // How many boats to consider, in addition to visible boats when spawning new crates
 	fastForwardTicks: 2,
 	enabledCrateTypes: [CrateType.Circle, CrateType.Square],
@@ -50,7 +50,7 @@ export const createConfiguration: () => Configuration = () => ({
 	enableJokerCrates: false,
 	enableJokerCrateBoats: false,
 	holdForXTurns: 2,
-	jokerCrateChance: 1 / 20,
+	jokerCrateChance: 1 / 10,
 	craneType: CraneType.OnlyEmpty,
 	cranePattern: CranePattern.SameLane,
 	craneRange: 2, // Only applies to CranePattern.Cross and CranePattern.SameLane
@@ -103,7 +103,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 	} else if (level === 3) {
 		configuration.shipsNeeded = 6;
 		configuration.crateSpawningDistribution = [
-			[2, 0],
+			[3, 0],
 			[2, 1],
 			[1, 2],
 		];
@@ -117,7 +117,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 	} else if (level === 4) {
 		configuration.shipsNeeded = 6;
 		configuration.crateSpawningDistribution = [
-			[2, 0],
+			[3, 0],
 			[2, 1],
 			[1, 2],
 		];
@@ -127,6 +127,7 @@ export function advanceLevel(configuration: Configuration, level: number) {
 			[1, 4],
 			[0, 5],
 		];
+		configuration.enableJokerCrateBoats = true;
 	} else if (level === 5) {
 		configuration.shipsNeeded = 6;
 		configuration.boatLookAheadCount = 2;

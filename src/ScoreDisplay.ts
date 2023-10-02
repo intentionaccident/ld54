@@ -34,7 +34,8 @@ export class ScoreDisplay {
 			this.container.children[i].visible = false;
 		}
 
-		if (score < 3) {
+		if (score < 1) {
+			(this.container.children[6] as PIXI.Text).text = "";
 		} else if (score < 50) {
 			this.container.children[0].visible = true;
 		} else if (score < 100) {

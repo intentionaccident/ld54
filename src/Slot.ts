@@ -1,11 +1,9 @@
-import {Crate, CRATE_WIDTH, createCrate} from "./Crate";
+import {Crate} from "./Crate";
 import {AbilityType} from "./AbilityBar";
 import {GameState} from "./GameState";
 import * as PIXI from "pixi.js";
 import {CranePattern, CraneType} from "./Configuration";
 import {tick} from "./tick";
-import {animate} from "./animate";
-import {laneButtonTexture} from "./Lane";
 
 export const slotTexture = new PIXI.Texture(
 	PIXI.Texture.from('assets/track.gif').castToBaseTexture(), new PIXI.Rectangle(

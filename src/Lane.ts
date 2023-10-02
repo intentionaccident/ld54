@@ -45,11 +45,11 @@ export const pushUpButtonTexture = new PIXI.Texture(
 	)
 );
 
-export const laneButtonTexture = new PIXI.Texture(
-	PIXI.Texture.from('assets/garage1.png').castToBaseTexture(), new PIXI.Rectangle(
+export const laneButtonTextures = [1,2,3].map(i => new PIXI.Texture(
+	PIXI.Texture.from(`assets/garage${i}.png`).castToBaseTexture(), new PIXI.Rectangle(
 		0, 32, 160, 160
 	)
-);
+));
 
 export function incrementScore(state: GameState, value: number) {
 	setScore(state, state.score.value + value);
@@ -192,7 +192,7 @@ export class LaneButton {
 	constructor(
 		gameState: GameState,
 		row: number,
-		private readonly graphics: PIXI.Sprite,
+		private readonly graphics: PIXI.Container,
 		private readonly textGraphics: PIXI.Text
 	) {
 		this.showLock();
@@ -216,22 +216,33 @@ export class LaneButton {
 	public showFastForward() {
 		this.textGraphics.text = "⏩";
 		this.ability = AbilityType.FastForward;
+		for (let i = 0; i < this.graphics.children.length; i++) {
+			this.graphics.children[i].visible = false;
+		}
+		this.graphics.children[0].visible = true;
 	}
 
 	public showCompress() {
 		this.textGraphics.text = "🧲";
 		this.ability = AbilityType.Compress;
+		for (let i = 0; i < this.graphics.children.length; i++) {
+			this.graphics.children[i].visible = false;
+		}
+		this.graphics.children[0].visible = true;
 	}
 
 	public showLock() {
-		this.textGraphics.text = "🔓";
+		this.textGraphics.text = "";
 		this.ability = AbilityType.Lock;
+		for (let i = 0; i < this.graphics.children.length; i++) {
+			this.graphics.children[i].visible = false;
+		}
+		this.graphics.children[0].visible = true;
 	}
 
-	public showLocked(turnsLeft: number) {
-		// this.textGraphics.text = `⛓️\n${turnsLeft - 1}`;
-		this.textGraphics.text = `⛓️`;
+	public showLocked(turnsLeft: number) {;
 		this.ability = AbilityType.Lock;
+		this.graphics.children[2].visible = true;
 	}
 }
 
@@ -289,8 +300,12 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 	const actionButtons: ActionButton[] = [];
 	for (let row = 0; row < laneCount; row++) {
 		// const laneButton = createBox(laneButtonWidth, slotHeight, 16777215, true);
-		const laneButton = new PIXI.Sprite(laneButtonTexture);
-		setButtonAnimations(laneButton, [laneButton]);
+		const laneButton = new PIXI.Container();
+		for (let i = 0; i < laneButtonTextures.length; i++) {
+			const sprite = new PIXI.Sprite(laneButtonTextures[i]);
+			laneButton.addChild(sprite);
+		}
+		setButtonAnimations(laneButton, laneButton.children as PIXI.Sprite[]);
 		laneButton.x = leftMargin - 94;
 		laneButton.y = -64;
 		const laneButtonText = new PIXI.Text("", {
