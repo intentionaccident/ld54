@@ -75,9 +75,9 @@ export class AbilityBar {
 	private readonly buttons: PIXI.Graphics[] = [];
 	constructor(private readonly state: GameState) {
 		for (let i = 0; i < this.abilities.length; i++) {
-			const button = createBox(100, 100, 0xFFFFFF, true);
+			const button = createBox(100, 100, 0x431503, true, 6, 0x2e0e02);
 			button.y = VIEW_HEIGHT - button.height - 40;
-			button.x = 200 + (button.width) * i;
+			button.x = 120 + (button.width + 30) * i;
 			state.app.stage.addChild(button);
 			this.buttons.push(button);
 		}
@@ -87,6 +87,12 @@ export class AbilityBar {
 			text.x = this.buttons[i].width / 2;
 			text.y = this.buttons[i].height / 2;
 			this.buttons[i].addChild(text);
+			this.buttons[i].on('mousemove', () => {
+				text.style.fontSize = 58;
+			});
+			this.buttons[i].on('mouseleave', () => {
+				text.style.fontSize = 52;
+			});
 		};
 		for (let i = 0; i < this.abilities.length; i++) {
 			const[text, ability] = this.abilities[i];
