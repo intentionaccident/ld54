@@ -39,9 +39,9 @@ export class BoatManager {
 
 		deckBoat.graphics.rotation = Math.PI / 8 * 3
 		deckBoat.graphics.x = VIEW_WIDTH - (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-			- deckBoat.moorIndex * (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation) + getBoatWidth(deckBoat) * Math.sin(deckBoat.graphics.rotation)) - 10;
+			- deckBoat.moorIndex * (getBoatLength(deckBoat) * Math.cos(deckBoat.graphics.rotation) + getBoatWidth(deckBoat) * Math.sin(deckBoat.graphics.rotation)) - 20;
 		const deltaY = (getBoatWidth(deckBoat) * Math.cos(deckBoat.graphics.rotation))
-		const initialPosition = (VIEW_HEIGHT) - (getBoatLength(deckBoat) * Math.sin(deckBoat.graphics.rotation)) + deltaY - 10;
+		const initialPosition = (VIEW_HEIGHT) - (getBoatLength(deckBoat) * Math.sin(deckBoat.graphics.rotation)) + deltaY - 20;
 		deckBoat.graphics.y = initialPosition
 		deckBoat.graphics.on("mouseenter", () => deckBoat.graphics.y -= deltaY)
 		deckBoat.graphics.on("mouseleave", () => deckBoat.graphics.y = initialPosition)
@@ -129,10 +129,11 @@ export class BoatManager {
 }
 
 function moveBoatToLane(boat: Boat, lane: Lane) {
-	boat.graphics.rotation = 0
-	boat.graphics.y = 0
-	boat.graphics.x = 500
-	lane.graphics.addChild(boat.graphics)
+	boat.graphics.rotation = 0;
+	boat.graphics.pivot.set(-boat.graphics.width/2, -boat.graphics.height/2);
+	boat.graphics.y = 0;
+	boat.graphics.x = 800;
+	lane.graphics.addChild(boat.graphics);
 }
 
 function unmoorBoat(boat: Boat) {

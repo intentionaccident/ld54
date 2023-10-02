@@ -9,7 +9,7 @@ export enum CrateType {
 	Joker
 }
 
-export const CRATE_WIDTH = 16;
+export const CRATE_WIDTH = 32;
 export const CrateTypes = Object.values(CrateType).filter(Number.isInteger) as CrateType[]
 
 const cratesTexture = PIXI.Texture.from('assets/crates.gif');
@@ -43,7 +43,7 @@ export function createCrate(type: CrateType): Crate {
 	// container.addChild(graphics);
 	let wagonSprite = new PIXI.Sprite(wagonTexture);
 	wagonSprite.anchor.set(0.5, 0.5);
-	wagonSprite.y = 4;
+	wagonSprite.y = 8;
 	container.addChild(wagonSprite);
 	const crateSprite = new PIXI.Sprite(cratesTextures[type]);
 	crateSprite.anchor.set(0.5, 0.5);

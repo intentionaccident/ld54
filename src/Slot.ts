@@ -8,7 +8,7 @@ import {animate} from "./animate";
 
 export const slotTexture = new PIXI.Texture(
 	PIXI.Texture.from('assets/track.gif').castToBaseTexture(), new PIXI.Rectangle(
-		72, 48, 40, 48
+		2*72, 2*48, 2*40, 2*48
 	)
 );
 
@@ -123,8 +123,8 @@ export class Slot {
 
 	public cratePosition(crate: Crate): { x: number, y: number } {
 		return {
-			x: this.graphics.getGlobalPosition().x / 2 + this.graphics.width / 2,
-			y: this.graphics.getGlobalPosition().y / 2 + this.graphics.height / 2 - 10
+			x: Math.floor(this.graphics.getGlobalPosition().x + this.graphics.width / 2),
+			y: Math.floor(this.graphics.getGlobalPosition().y + this.graphics.height / 2) - 20
 		};
 	}
 
