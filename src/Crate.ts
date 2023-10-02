@@ -16,7 +16,7 @@ const cratesTexture = PIXI.Texture.from('assets/crates.gif');
 export const wagonTexture = new PIXI.Texture(cratesTexture.castToBaseTexture(), new PIXI.Rectangle(
 	0, 0, CRATE_WIDTH, CRATE_WIDTH
 ));
-export const cratesTextures = [1,2,3,4].map(i =>
+export const cratesTextures = [1,2,4,5].map(i =>
 	new PIXI.Texture(cratesTexture.castToBaseTexture(), new PIXI.Rectangle(
 		CRATE_WIDTH * i, 0, CRATE_WIDTH, CRATE_WIDTH
 	)));
