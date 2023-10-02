@@ -139,7 +139,7 @@ export function Root() {
 	app.stage.addChildAt(office, 12);
 
 	gameState.boatManager.setHandContainerZIndex(12);
-	gameState.lighthouse.setZIndex(11);
+	gameState.lighthouse.setZIndex(10);
 
 	gameState.scoreDisplay = new ScoreDisplay(gameState.app);
 
