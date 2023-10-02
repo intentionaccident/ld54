@@ -7,7 +7,7 @@ import {weightedSample} from "./random";
 import {advanceLevel, Configuration} from "./Configuration";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
-import {Slot, slotTexture} from "./Slot";
+import {interchangeTexture, Slot, slotTexture} from "./Slot";
 
 export interface ActionButton {
 	action: Action;
@@ -276,6 +276,12 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			const slotGraphics = new PIXI.Sprite(slotTexture);
 			slotGraphics.x = leftMargin + laneButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
+			if (row !== 0) {
+				const interchangeGraphics = new PIXI.Sprite(interchangeTexture);
+				interchangeGraphics.x = 30;
+				interchangeGraphics.y = -56;
+				slotGraphics.addChild(interchangeGraphics);
+			}
 			let slot = new Slot(
 				gameState,
 				slotGraphics

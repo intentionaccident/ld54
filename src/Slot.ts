@@ -12,6 +12,12 @@ export const slotTexture = new PIXI.Texture(
 	)
 );
 
+export const interchangeTexture = new PIXI.Texture(
+	PIXI.Texture.from('assets/intercange.gif').castToBaseTexture(), new PIXI.Rectangle(
+		150, 136, 52, 108
+	)
+);
+
 export class Slot {
 	private ability: AbilityType | null = null;
 
