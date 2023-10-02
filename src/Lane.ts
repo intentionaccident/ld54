@@ -100,6 +100,7 @@ export function setProgress(state: GameState, value: number) {
 		minimumFractionDigits: 0
 	});
 	state.progress.graphics.text = `${s}`;
+	state.boatManager?.updateDeckGraphics();
 }
 function createRandomCrate(configuration: Configuration, requestPool: Record<CrateType, number>): Crate | null {
 	if (configuration.enableJokerCrates && Math.random() < configuration.jokerCrateChance) {

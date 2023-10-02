@@ -5,11 +5,20 @@ import {GameState} from "./GameState";
 import {Lane} from "./Lane";
 import {slotTexture} from "./Slot";
 import * as PIXI from "pixi.js";
+import {Simulate} from "react-dom/test-utils";
+import stalled = Simulate.stalled;
+
+export const deckTextures = [
+	PIXI.Texture.from('assets/deck1.png'),
+	PIXI.Texture.from('assets/deck2.png'),
+	PIXI.Texture.from('assets/deck3.png'),
+];
 
 export class BoatManager {
 	static readonly BOAT_BUFFER = 6;
 	public boats: Boat[] = [];
 	private readonly handContainer: PIXI.Container = new PIXI.Container;
+	private readonly deckGraphics: PIXI.Container;
 
 	constructor(private readonly gameState: GameState) {
 		gameState.app.stage.addChild(this.handContainer);
@@ -18,6 +27,13 @@ export class BoatManager {
 			const boat = createBoat(this.gameState.configuration);
 			this.boats.push(boat);
 		}
+		this.deckGraphics = new PIXI.Container();
+		this.deckGraphics.x -= 80;
+		for (let i = 0; i < 3; i++) {
+			const deckSprite = new PIXI.Sprite(deckTextures[i]);
+			this.deckGraphics.addChild(deckSprite);
+		}
+		this.handContainer.addChild(this.deckGraphics);
 	}
 
 	public setHandContainerZIndex(i: number) {
@@ -137,6 +153,21 @@ export class BoatManager {
 		for (const lane of this.gameState.lanes) {
 			lane.addBoatButton.visible = false
 			lane.addBoatButton.off("click")
+		}
+	}
+
+	public updateDeckGraphics() {
+		for (let i = 0; i < this.deckGraphics.children.length; i++) {
+			this.deckGraphics.children[i].visible = false;
+		}
+		let progress = this.gameState.progress.value / this.gameState.configuration.shipsNeeded;
+		let shipsLeft = this.gameState.configuration.shipsNeeded - this.gameState.progress.value;
+		if (progress < .40) {
+			this.deckGraphics.children[2].visible = true;
+		} else if (progress < .60) {
+			this.deckGraphics.children[1].visible = true;
+		} else if (shipsLeft > 1) {
+			this.deckGraphics.children[0].visible = true;
 		}
 	}
 }
