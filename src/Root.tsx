@@ -166,6 +166,7 @@ export function Root() {
 				text={messages[text].replace("%", (gameState!.level.value + 2).toString())}
 				close={() => setText(null)}
 				reload={text === LetterType.Death}
+				post={text === LetterType.Intro && "Don't forget to take a break and smoke your pipe once in a while."}
 			/>}
 		</GameFrame>
 	</div>;
