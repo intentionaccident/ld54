@@ -64,6 +64,8 @@ export function Root() {
 		activeAbility: null,
 		laneAnimations: [],
 		actionAnimations: [],
+		nonBlockingAnimations: [],
+		popupIsActive: false
 	};
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;

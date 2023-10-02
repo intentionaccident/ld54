@@ -1,6 +1,12 @@
 import {GameState} from "./GameState";
 
 export function animate(gameState: GameState) {
+	if (gameState.popupIsActive) return;
+
+	if (gameState.nonBlockingAnimations.length > 0) {
+		animateNonBlockingAnimations(gameState);
+	}
+
 	if (gameState.actionAnimations.length > 0) {
 		animateActions(gameState);
 		return;
@@ -24,6 +30,14 @@ function animateActions(gameState: GameState) {
 	for (let i = gameState.actionAnimations.length - 1; i >= 0; i--) {
 		if (!gameState.actionAnimations[i]()) {
 			gameState.actionAnimations.splice(i, 1);
+		}
+	}
+}
+
+function animateNonBlockingAnimations(gameState: GameState) {
+	for (let i = gameState.nonBlockingAnimations.length - 1; i >= 0; i--) {
+		if (!gameState.nonBlockingAnimations[i]()) {
+			gameState.nonBlockingAnimations.splice(i, 1);
 		}
 	}
 }

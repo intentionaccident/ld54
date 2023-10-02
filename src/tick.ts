@@ -42,17 +42,49 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 				continue;
 			} else {
 				incrementScore(gameState, lane.boat.size);
+				const boat = lane.boat;
+				gameState.boatManager?.removeBoat(lane, false);
+				let speed = 0.5;
+				gameState.nonBlockingAnimations.push(() => {
+					boat.boatGraphics.x += speed;
+					speed += 0.005;
+					speed = Math.min(2, speed);
+					// boat.boatGraphics.alpha *= 0.95;
+					// if (boat.boatGraphics.alpha <= 0.01) {
+					if (boat.boatGraphics.x > 2000) {
+						boat.manifestGraphics.destroy();
+						boat.boatGraphics.destroy();
+						return false;
+					}
+					return true;
+				});
 			}
 		} else {
 			decrementLives(gameState);
+			const boat = lane.boat;
+			gameState.boatManager?.removeBoat(lane, false);
+			let ticker = 0;
+			let initialX = boat.boatGraphics.x;
+			gameState.nonBlockingAnimations.push(() => {
+				boat.boatGraphics.y += 0.1;
+				ticker += 1;
+				boat.boatGraphics.x = initialX + 2 * Math.sin(ticker / 4)
+				boat.boatGraphics.alpha *= 0.95;
+				if (boat.boatGraphics.alpha <= 0.01) {
+					boat.manifestGraphics.destroy();
+					boat.boatGraphics.destroy();
+					return false;
+				}
+				return true;
+			});
 		}
 
 		incrementProgress(gameState, 1);
-		gameState.boatManager?.removeBoat(lane);
 	}
 }
 
 export function tick(gameState: GameState, action: Action) {
+	if (gameState.popupIsActive) return;
 	if (gameState.laneAnimations.length > 0 || gameState.actionAnimations.length > 0) return;
 
 	deactivateAbility(gameState);
