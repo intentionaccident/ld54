@@ -119,18 +119,8 @@ function createRandomCrate(configuration: Configuration, requestPool: Record<Cra
 		.map(([type, weight]) => [weight, parseInt(type) as CrateType]);
 	const crate = weightedSample(options);
 	if (crate !== null) {
-		let msg = "";
-		let totalWeight = options.reduce((s, o) => s + o[0], 0);
-		for (const [weight, type] of options) {
-			const s = Number(weight / totalWeight).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 0 });
-			msg += `${CrateType[type]}: ${s}`;
-			msg += '\n';
-		}
-		console.log(msg);
 		return createCrate(crate);
 	} else {
-		console.warn("Failed to get a sample");
-		console.warn(options);
 		return null;
 	}
 }
