@@ -13,6 +13,11 @@ import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
 
 const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe.png');
 const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
+const pierTexture =  new PIXI.Texture(
+	PIXI.Texture.from('assets/pier.png').castToBaseTexture(), new PIXI.Rectangle(
+		208, 96, 74, 96
+	)
+);
 
 export interface ActionButton {
 	action: Action;
@@ -56,6 +61,7 @@ export function setScore(state: GameState, value: number) {
 }
 
 export function setLives(state: GameState, value: number) {
+	if (value < 0) value = 0;
 	state.lives.value = value;
 	state.lives.graphics.text = `Lives: ${value}`;
 	state.lighthouse.setLives(state.lives.value);
@@ -72,7 +78,7 @@ export function incrementLevel(state: GameState) {
 	state.abilityBar!.onConfigurationChanged();
 	for (const lane of state.lanes) {
 		for (const slot of lane.slots) {
-			if (slot.crate !== null) slot.destroyCrate();
+			if (slot.crate !== null) slot.pushCrateIntoWater();
 		}
 	}
 	state.boatManager!.reset();
@@ -303,7 +309,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		};
 
 		lane.addBoatButton.pivot.set(0, -lane.addBoatButton.height/2);
-		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1);
+		lane.addBoatButton.x = leftMargin + slotWidth * (slotCount + 1) + 14;
 		lane.addBoatButton.y = -120;
 		lane.addBoatButton.visible = false;
 		lane.graphics.addChild(lane.addBoatButton);
@@ -341,6 +347,9 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 				slot.button = button;
 			}
 		}
+		const pier = new PIXI.Sprite(pierTexture);
+		pier.x = 810 - row * 16;
+		lane.graphics.addChildAt(pier, 2);
 		lane.graphics.addChild(laneButton);
 		lanes.push(lane);
 		gameState.app.stage.addChild(lane.graphics);
