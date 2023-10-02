@@ -79,6 +79,7 @@ export function incrementLevel(state: GameState) {
 		for (const slot of lane.slots) {
 			if (slot.crate !== null) slot.pushCrateIntoWater();
 		}
+		lane.lockTurnsLeft = 0;
 	}
 	state.boatManager!.reset();
 	state.onLevelChanged()
@@ -306,6 +307,20 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 			laneButton.addChild(sprite);
 		}
 		setButtonAnimations(laneButton, laneButton.children as PIXI.Sprite[]);
+
+		const showTexture = (i: number) => {
+			for (let child of laneButton.children) {
+				child.visible = false;
+			}
+			laneButton.children[i].visible = true;
+		}
+		laneButton.on('mousemove', () => {
+			if (lane.lockTurnsLeft === 0) showTexture(1);
+		});
+		laneButton.on('mouseleave', () => {
+			if (lane.lockTurnsLeft === 0) showTexture(0)
+		});
+
 		laneButton.x = leftMargin - 94;
 		laneButton.y = -64-32;
 		const laneButtonText = new PIXI.Text("", {
