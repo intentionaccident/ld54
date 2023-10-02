@@ -3,13 +3,13 @@ import * as PIXI from "pixi.js";
 import { GameFrame } from "./GameFrame";
 import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
-import {addLaneGraphics, setScore, setLives, setLevel, incrementLevel, setProgress} from "./Lane";
+import { addLaneGraphics, setScore, setLives, setLevel, incrementLevel, setProgress } from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
 import { AbilityBar } from "./AbilityBar";
-import {advanceLevel, createConfiguration} from "./Configuration";
-import {animate} from "./animate";
+import { animate } from "./animate";
+import { advanceLevel, createConfiguration } from "./Configuration";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -89,6 +89,10 @@ export function Root() {
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));
 	}
+
+
+	const scratch = new PIXI.Sprite(PIXI.Texture.from('assets/scratch.gif'));
+	app.stage.addChild(scratch)
 
 	return <div>
 		<GameFrame>
