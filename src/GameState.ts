@@ -28,4 +28,5 @@ export interface GameState {
 	popupIsActive: boolean;
 	lighthouse: Lighthouse;
 	onDeath: () => void;
+	onLevelChanged: () => void;
 }

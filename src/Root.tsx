@@ -56,7 +56,7 @@ enum LetterType {
 const messages: Record<LetterType, string> = {
 	[LetterType.Death]: "Due to gross negligence and loss of cargo we regret to announce your immediate dismissal from the position of Harbour Master. Good luck in future ventures.",
 	[LetterType.Intro]: "Welcome to the Port. You must deliver the requested goods to the ships in the correct order. Make sure not to misload the ships or drop any cargo into the harbour, the lighthouse man will be keeping count of the missed shipments.",
-	[LetterType.LevelAdvance]: "Attached are the manifests of the ship for today, %/08/1923"
+	[LetterType.LevelAdvance]: "Great work yesterday, % of October. Keep it up day."
 }
 
 export function Root() {
@@ -119,7 +119,8 @@ export function Root() {
 		nonBlockingAnimations: [],
 		popupIsActive: false,
 		lighthouse: new Lighthouse(app),
-		onDeath: () => setText(LetterType.Death)
+		onDeath: () => setText(LetterType.Death),
+		onLevelChanged: () => setText(LetterType.LevelAdvance)
 	};
 	app.ticker.add(() => {
 		bunny.rotation += 0.01;
@@ -156,7 +157,7 @@ export function Root() {
 		<GameFrame>
 			<PixiRoot app={app} />
 			{text != null && <UIRoot
-				text={messages[text].replace("%", gameState.level.value.toString())}
+				text={messages[text].replace("%", (gameState.level.value + 2).toString())}
 				close={() => setText(null)}
 				reload={text === LetterType.Death}
 			/>}
