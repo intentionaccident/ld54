@@ -158,7 +158,6 @@ export class BoatManager {
 		}
 		let shipsInDeck = this.boats.filter(b => b.location === BoatLocation.Deck).length;
 		let progress = shipsInDeck / (this.gameState.configuration.shipsNeeded - 2);
-		console.log(progress)
 		if (shipsInDeck !== 0) {
 			if (progress >= .66) {
 				this.deckGraphics.children[2].visible = true;
