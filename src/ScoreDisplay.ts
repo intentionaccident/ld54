@@ -13,6 +13,7 @@ export class ScoreDisplay {
 			this.container.addChild(sprite);
 		}
 		const text = new PIXI.Text("SCORE", {
+			fontFamily: 'Allura',
 			align: "center",
 			fill: 0xFFFFFF,
 			fontSize: 38,

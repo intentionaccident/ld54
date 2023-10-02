@@ -123,10 +123,10 @@ export function Root() {
 	gameState.abilityBar = new AbilityBar(gameState);
 
 	const office = new PIXI.Sprite(PIXI.Texture.from('assets/office.gif'));
-	app.stage.addChildAt(office, 8);
+	app.stage.addChildAt(office, 12);
 
-	gameState.boatManager.setHandContainerZIndex(8);
-	gameState.lighthouse.setZIndex(7);
+	gameState.boatManager.setHandContainerZIndex(12);
+	gameState.lighthouse.setZIndex(11);
 
 	gameState.scoreDisplay = new ScoreDisplay(gameState.app);
 
