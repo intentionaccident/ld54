@@ -7,6 +7,7 @@ import {slotTexture} from "./Slot";
 import * as PIXI from "pixi.js";
 import {Simulate} from "react-dom/test-utils";
 import stalled = Simulate.stalled;
+import {paperSound} from "./sounds";
 
 export const deckTextures = [
 	PIXI.Texture.from('assets/deck1.png'),
@@ -91,6 +92,7 @@ export class BoatManager {
 						lane.addBoatButton.visible = false
 						lane.addBoatButton.off("click")
 					}
+					paperSound.play()
 				})
 			}
 		})

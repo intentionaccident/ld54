@@ -5,6 +5,7 @@ import { GameState } from "./GameState";
 import { deactivateAbility } from "./AbilityBar";
 import { CompressType, FlushType } from "./Configuration";
 import { moveCrate, swapCrate } from "./Slot";
+import {plopSound, sirenSound, slideSound} from "./sounds";
 
 function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane = true) {
 	if (lane.lockTurnsLeft > 1) {
@@ -28,6 +29,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 
 		if (!lane.boat) {
 			decrementLives(gameState);
+			plopSound.play();
 			continue;
 		}
 
@@ -42,6 +44,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 				continue;
 			} else {
 				incrementScore(gameState, lane.boat.size);
+				sirenSound.play()
 				let wait = 0.5 * 60;
 				const boat = lane.boat;
 				gameState.boatManager?.removeBoat(lane, false);
@@ -64,6 +67,7 @@ function moveLaneForward(gameState: GameState, lane: Lane, fromCol = 0, isLane =
 			}
 		} else {
 			decrementLives(gameState);
+			plopSound.play();
 			const boat = lane.boat;
 			gameState.boatManager?.removeBoat(lane, false);
 			let ticker = 0;
@@ -205,5 +209,8 @@ export function tick(gameState: GameState, action: Action) {
 		gameState.app.stage.addChild(message);
 	} else if (gameState.progress.value >= gameState.configuration.shipsNeeded) {
 		incrementLevel(gameState);
+	} else {
+		slideSound.speed = 5;
+		slideSound.play();
 	}
 }
