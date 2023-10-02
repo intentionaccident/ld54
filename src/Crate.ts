@@ -14,6 +14,9 @@ export const CrateTypes = Object.values(CrateType).filter(Number.isInteger) as C
 export interface Crate {
 	graphics: PIXI.Graphics;
 	type: CrateType;
+	actionPath: { x: number, y: number }[];
+	lanePath: { x: number, y: number }[];
+	isDead: boolean;
 }
 
 const colorMap = {
@@ -58,8 +61,12 @@ export function createCrate(type: CrateType): Crate {
 		}
 	}
 	graphics.endFill();
+	graphics.pivot.set(graphics.width / 2, graphics.height / 2);
 	return {
 		type,
-		graphics
+		graphics,
+		actionPath: [],
+		lanePath: [],
+		isDead: false
 	};
 }

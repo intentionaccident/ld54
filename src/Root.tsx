@@ -9,6 +9,7 @@ import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
 import { AbilityBar } from "./AbilityBar";
 import {advanceLevel, createConfiguration} from "./Configuration";
+import {animate} from "./animate";
 
 export function Root() {
 	const app = new PIXI.Application({
@@ -28,9 +29,6 @@ export function Root() {
 	bunny.anchor.x = 0.5;
 	bunny.anchor.y = 0.5;
 	app.stage.addChild(bunny);
-	app.ticker.add(() => {
-		bunny.rotation += 0.01;
-	});
 
 
 	const score = new PIXI.Text();
@@ -63,8 +61,14 @@ export function Root() {
 		progress: { value: 0, graphics: progress },
 		configuration: createConfiguration(),
 		selectedSlot: null,
-		activeAbility: null
+		activeAbility: null,
+		laneAnimations: [],
+		actionAnimations: [],
 	};
+	app.ticker.add(() => {
+		bunny.rotation += 0.01;
+		animate(gameState);
+	});
 
 	gameState.boatManager = new BoatManager(gameState)
 	gameState.boatManager.drawBoatFromDeck()

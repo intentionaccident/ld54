@@ -19,4 +19,6 @@ export interface GameState {
 	configuration: Configuration;
 	selectedSlot: Slot | null;
 	activeAbility: AbilityType | null;
+	laneAnimations: (() => boolean)[];
+	actionAnimations: (() => boolean)[];
 }

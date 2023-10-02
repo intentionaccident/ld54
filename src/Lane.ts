@@ -137,7 +137,21 @@ export function spawnCrateLine(gameState: GameState, slots: Slot[]) {
 		const slot = slots[Math.floor(Math.random() * slots.length)];
 		slots.splice(slots.indexOf(slot), 1); // del slot
 		if (slot.crate === null) {
-			slot.addCrate(createRandomCrate(gameState.configuration, cratePool));
+			let crate = createRandomCrate(gameState.configuration, cratePool);
+			slot.addCrate(crate);
+			if (crate !== null) {
+				crate.graphics.scale.set(0, 0);
+				gameState.laneAnimations.push(() => {
+					crate!.graphics.scale.x += (1 - crate!.graphics.scale.x) / 5;
+					crate!.graphics.scale.y += (1 - crate!.graphics.scale.y) / 5;
+					console.log(crate!.graphics.scale.y )
+					const epsilon = 10e-3;
+					if (Math.abs(1 - crate!.graphics.scale.x) < epsilon) {
+						crate!.graphics.scale.set(1,1)
+						return false;
+					} else return true;
+				})
+			}
 		}
 	}
 }
@@ -231,7 +245,7 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		for (let col = 0; col < slotCount; col++) {
 			const slotGraphics = createBox(
 				slotWidth, slotHeight,
-				10265226
+				0x9ca28a
 			);
 			slotGraphics.x = leftMargin + laneButtonWidth + col * slotWidth;
 			lane.graphics.addChild(slotGraphics);
