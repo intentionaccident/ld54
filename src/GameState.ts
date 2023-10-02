@@ -14,6 +14,7 @@ export interface GameState {
 	score: { value: number, graphics: PIXI.Text };
 	lives: { value: number, graphics: PIXI.Text };
 	level: { value: number, graphics: PIXI.Text };
+	progress: { value: number, graphics: PIXI.Text };
 	boatManager?: BoatManager;
 	configuration: Configuration;
 	selectedSlot: Slot | null;

@@ -3,7 +3,7 @@ import * as PIXI from "pixi.js";
 import { GameFrame } from "./GameFrame";
 import { UIRoot } from "./UIRoot";
 import { PixiRoot } from "./PixiRoot";
-import {addLaneGraphics, setScore, setLives, setLevel, incrementLevel} from "./Lane";
+import {addLaneGraphics, setScore, setLives, setLevel, incrementLevel, setProgress} from "./Lane";
 import { GameState } from "./GameState";
 import { tick } from "./tick";
 import { BoatManager } from "./BoatManager";
@@ -46,7 +46,11 @@ export function Root() {
 	level.x = 520;
 	level.y = 60;
 	app.stage.addChild(level);
-	level.interactive = true;
+
+	const progress = new PIXI.Text();
+	progress.x = 600;
+	progress.y = 90;
+	app.stage.addChild(progress);
 
 	const gameState: GameState = {
 		app,
@@ -56,6 +60,7 @@ export function Root() {
 		score: { value: 0, graphics: score },
 		lives: { value: 0, graphics: lives },
 		level: { value: 0, graphics: level },
+		progress: { value: 0, graphics: progress },
 		configuration: createConfiguration(),
 		selectedSlot: null,
 		activeAbility: null
@@ -69,11 +74,13 @@ export function Root() {
 	gameState.actionButtons = actionButtons
 	gameState.lanes = lanes
 	gameState.abilityBar = new AbilityBar(gameState);
+	level.interactive = true;
 	level.on('click', () => incrementLevel(gameState)); // For debugging
 
 	setScore(gameState, 0);
 	setLives(gameState, 3);
 	setLevel(gameState, 0);
+	setProgress(gameState, 0);
 	while (gameState.level.value < 0) incrementLevel(gameState); // For debugging
 	for (const button of actionButtons) {
 		button.graphics.on('click', () => tick(gameState, button.action));

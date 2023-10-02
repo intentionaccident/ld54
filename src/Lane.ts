@@ -41,10 +41,17 @@ export function decrementLives(state: GameState, value: number = 1) {
 	setLives(state, state.lives.value - value);
 }
 
-export function incrementLevel(state: GameState, value: number = 1) {
-	setLevel(state, state.level.value + value);
+export function incrementLevel(state: GameState) {
+	setProgress(state, 0);
+	setLevel(state, state.level.value + 1);
 	advanceLevel(state.configuration, state.level.value);
 	state.abilityBar!.onConfigurationChanged();
+	for (const lane of state.lanes) {
+		for (const slot of lane.slots) {
+			if (slot.crate !== null) slot.destroyCrate();
+		}
+	}
+	state.boatManager!.reset();
 }
 
 export function setLevel(state: GameState, value: number) {
@@ -52,6 +59,18 @@ export function setLevel(state: GameState, value: number) {
 	state.level.graphics.text = `Level: ${value+1}`;
 }
 
+export function incrementProgress(state: GameState, value: number) {
+	setProgress(state, state.progress.value + value);
+}
+
+export function setProgress(state: GameState, value: number) {
+	state.progress.value = value;
+	const s = Number(state.progress.value / state.configuration.shipsNeeded).toLocaleString(undefined, {
+		style: 'percent',
+		minimumFractionDigits: 0
+	});
+	state.progress.graphics.text = `${s}`;
+}
 function createRandomCrate(configuration: Configuration, requestPool: Record<CrateType, number>): Crate | null {
 	if (configuration.enableJokerCrates && Math.random() < configuration.jokerCrateChance) {
 		return createCrate(CrateType.Joker)
