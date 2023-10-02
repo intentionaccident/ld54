@@ -9,10 +9,14 @@ import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
 import {interchangeTexture, Slot, slotTexture} from "./Slot";
 import {GrayscaleFilter} from "@pixi/filter-grayscale";
+import {VIEW_HEIGHT, VIEW_WIDTH} from "./view";
+
+const pipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe.png');
+const smokingPipeTexture: PIXI.Texture = PIXI.Texture.from('assets/pipe1.png');
 
 export interface ActionButton {
 	action: Action;
-	graphics: PIXI.Graphics | PIXI.Sprite;
+	graphics: PIXI.DisplayObject;
 }
 
 export interface Lane {
@@ -223,7 +227,7 @@ export class LaneButton {
 	}
 }
 
-function setButtonAnimations(button: PIXI.Sprite, targets: PIXI.Sprite[]) {
+function setButtonAnimations(button: PIXI.DisplayObject, targets: PIXI.Sprite[]) {
 	button.interactive = true;
 	const highlight = (tint: PIXI.ColorSource) => {
 		let color = new PIXI.Color(tint);
@@ -362,9 +366,27 @@ export function addLaneGraphics(gameState: GameState): [Lane[], ActionButton[]] 
 		}
 	}
 
-	const button = createBox(laneButtonWidth, slotHeight, 16777215, true);
-	button.x = leftMargin;
-	button.y = 2*230;
+	const button = new PIXI.Container();
+	const buttonPipe = new PIXI.Sprite(pipeTexture);
+	button.addChild(buttonPipe);
+	const buttonSmokingPipe = new PIXI.Sprite(smokingPipeTexture);
+	buttonSmokingPipe.visible = false;
+	button.addChild(buttonSmokingPipe);
+	button.on('mousemove', () => {
+		buttonPipe.visible = false;
+		buttonSmokingPipe.visible = true;
+	});
+	button.on('mouseleave', () => {
+		buttonPipe.visible = true;
+		buttonSmokingPipe.visible = false;
+	});
+	const width = 180;
+	const height = 160;
+	button.hitArea = new PIXI.Rectangle(
+		0, VIEW_HEIGHT - height, width, height
+	);
+	button.interactive = true;
+	button.cursor = "pointer";
 	actionButtons.push({graphics: button, action: {type: "none"}});
 	gameState.app.stage.addChild(button);
 
