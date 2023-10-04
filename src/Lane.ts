@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 import {Crate, CrateType, CrateTypes, createCrate} from "./Crate";
 import {Boat, boatTexture} from "./Boat";
 import {GameState} from "./GameState";
-import {weightedSample} from "./random";
+import {sample, weightedSample} from "./random";
 import {advanceLevel, Configuration} from "./Configuration";
 import {AbilityType} from "./AbilityBar";
 import {tick} from "./tick";
@@ -117,7 +117,10 @@ function createRandomCrate(configuration: Configuration, requestPool: Record<Cra
 
 	let options: [number, CrateType][] = Object.entries(requestPool)
 		.map(([type, weight]) => [weight, parseInt(type) as CrateType]);
-	const crate = weightedSample(options);
+	let crate = weightedSample(options);
+	if (crate === CrateType.Joker) {
+		crate = sample(configuration.enabledCrateTypes);
+	}
 	if (crate !== null) {
 		return createCrate(crate);
 	} else {

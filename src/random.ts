@@ -16,6 +16,12 @@ export function weightedSample<T>(options: [number, T][]): T | null {
 	throw new Error("Unreachable.");
 }
 
+export function sample<T>(options: T[]): T | null {
+	return options.length === 0
+		? null :
+		options[randomInt(0, options.length - 1)];
+}
+
 export function randomInt(min: number, max: number): number {
 	min = Math.ceil(min);
 	max = Math.floor(max);

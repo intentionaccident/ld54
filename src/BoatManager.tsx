@@ -108,7 +108,7 @@ export class BoatManager {
 			[CrateType.Triangle]: countCrates(CrateType.Triangle),
 			[CrateType.Square]: countCrates(CrateType.Square),
 			[CrateType.Cross]: countCrates(CrateType.Cross),
-			[CrateType.Joker]: 0,
+			[CrateType.Joker]: countCrates(CrateType.Joker),
 		};
 		return pool;
 	}
